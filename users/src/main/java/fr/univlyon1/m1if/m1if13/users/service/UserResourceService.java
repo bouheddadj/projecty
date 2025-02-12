@@ -2,7 +2,6 @@ package fr.univlyon1.m1if.m1if13.users.service;
 
 import fr.univlyon1.m1if.m1if13.users.dto.UserResponseDto;
 import fr.univlyon1.m1if.m1if13.users.dto.UsersResponseDto;
-import fr.univlyon1.m1if.m1if13.users.exception.UsernameAlreadyTakenException;
 import fr.univlyon1.m1if.m1if13.users.dto.LinkDto;
 import fr.univlyon1.m1if.m1if13.users.model.User;
 import fr.univlyon1.m1if.m1if13.users.dao.UserDao;
@@ -42,9 +41,6 @@ public class UserResourceService {
     }
 
     public URI createUser(User user) throws NameNotFoundException, NameAlreadyBoundException {
-        if (userDao.findOne(user.getLogin()) != null) {
-            throw new UsernameAlreadyTakenException("Nom d'utilisateur déjà pris");
-        }
         userDao.add(user);
         return URI.create("users/" + user.getLogin());
     }

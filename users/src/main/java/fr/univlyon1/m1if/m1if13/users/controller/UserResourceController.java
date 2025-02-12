@@ -2,7 +2,6 @@ package fr.univlyon1.m1if.m1if13.users.controller;
 
 import fr.univlyon1.m1if.m1if13.users.dto.UserResponseDto;
 import fr.univlyon1.m1if.m1if13.users.dto.UsersResponseDto;
-import fr.univlyon1.m1if.m1if13.users.exception.UsernameAlreadyTakenException;
 import fr.univlyon1.m1if.m1if13.users.model.User;
 import fr.univlyon1.m1if.m1if13.users.service.UserResourceService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -51,14 +50,14 @@ public class UserResourceController {
             throws NameNotFoundException, NameAlreadyBoundException {
         try {
             return ResponseEntity.created(userResourceService.createUser(user)).build();
-        } catch (UsernameAlreadyTakenException e) {
+        } catch (NameNotFoundException e) {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
                     e.getMessage());
         } catch (Exception e) {
             throw new ResponseStatusException(
                     HttpStatus.INTERNAL_SERVER_ERROR,
-                    "Un problème est survenu lors de la création de l'utilisateur.");
+                    e.getMessage());
         }
     }
 

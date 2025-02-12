@@ -12,14 +12,15 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @EnableWebMvc
 public class WebMvcConfig implements WebMvcConfigurer {
 
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOrigins("https://editor-next.swagger.io", "http://localhost", "http://127.0.0.1", "http://localhost:8080",
-                    "https://192.168.75.XXX", "http://192.168.75.XXX:8080")
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                .allowedHeaders("Authorization", "Content-Type")
-                .exposedHeaders("Authorization", "Content-Type", "Location", "Link")
-                .allowCredentials(true).maxAge(3600);
-    }
+        @Override
+        public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/**")
+                                .allowedOrigins("https://editor-next.swagger.io", "http://localhost",
+                                                "http://127.0.0.1", "http://localhost:8080",
+                                                "https://192.168.75.XXX", "http://192.168.75.XXX:8080")
+                                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                                .allowedHeaders("Authorization", "Content-Type")
+                                .exposedHeaders("Authorization", "Content-Type", "Location", "Link")
+                                .allowCredentials(true).maxAge(3600);
+        }
 }
