@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.NoSuchElementException;
+
 import javax.naming.AuthenticationException;
 import javax.naming.NameNotFoundException;
 
@@ -67,18 +69,24 @@ public class UsersOperationsController {
             throw new ResponseStatusException(
                     HttpStatus.UNAUTHORIZED,
                     "Erreur de correspondance des noms pour l'utilisateur " + loginDto.login() + ".");
-        } catch (NameNotFoundException e) {
+        } catch (NoSuchElementException e) {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND,
                     "Utilisateur " + loginDto.login() + " inconnu.");
+        } catch (Exception e) {
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Un problème est survenu lors de l'authentification de l'utilisateur.");
         }
     }
 
     /**
      * Réalise la déconnexion.
+     *
+     * @throws NameNotFoundException
      */
     @PostMapping("/logout")
-    public ResponseEntity<String> login(@RequestAttribute("username") String username) {
+    public ResponseEntity<String> login(@RequestAttribute("username") String username) throws NameNotFoundException {
         try {
             userOperationService.logout(username);
             return ResponseEntity.noContent().build();
@@ -86,10 +94,14 @@ public class UsersOperationsController {
             throw new ResponseStatusException(
                     HttpStatus.UNAUTHORIZED,
                     "L'utilisateur " + username + " n'est pas connecté.");
-        } catch (NameNotFoundException e) {
+        } catch (NoSuchElementException e) {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND,
                     "Utilisateur " + username + " inconnu.");
+        } catch (Exception e) {
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Un problème est survenu lors de la déconnexion de l'utilisateur.");
         }
     }
 
@@ -113,10 +125,14 @@ public class UsersOperationsController {
             if (isAuthenticated) {
                 return ResponseEntity.noContent().build();
             } else {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+                throw new ResponseStatusException(
+                        HttpStatus.UNAUTHORIZED,
+                        "Token invalide.");
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Un problème est survenu lors de l'authentification des tokens");
         }
     }
 }

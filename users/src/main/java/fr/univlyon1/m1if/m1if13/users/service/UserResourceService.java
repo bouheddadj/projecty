@@ -2,6 +2,7 @@ package fr.univlyon1.m1if.m1if13.users.service;
 
 import fr.univlyon1.m1if.m1if13.users.dto.UserResponseDto;
 import fr.univlyon1.m1if.m1if13.users.dto.UsersResponseDto;
+import fr.univlyon1.m1if.m1if13.users.exception.UsernameAlreadyTakenException;
 import fr.univlyon1.m1if.m1if13.users.dto.LinkDto;
 import fr.univlyon1.m1if.m1if13.users.model.User;
 import fr.univlyon1.m1if.m1if13.users.dao.UserDao;
@@ -14,10 +15,11 @@ import javax.naming.NameAlreadyBoundException;
 import javax.naming.NameNotFoundException;
 import java.net.URI;
 import java.util.Collection;
+import java.util.NoSuchElementException;
 
 /**
  * Méthodes de service du contrôleur de ressources sur les utilisateurs.
-  */
+ */
 @Service
 public class UserResourceService {
 
@@ -36,26 +38,35 @@ public class UserResourceService {
                 .map(User::getLogin)
                 .map(s -> "users/" + s)
                 .map(LinkDto::new)
-                .toList()
-        );
+                .toList());
     }
 
-    public URI createUser(User user) throws NameAlreadyBoundException {
+    public URI createUser(User user) throws NameNotFoundException, NameAlreadyBoundException {
+        if (userDao.findOne(user.getLogin()) != null) {
+            throw new UsernameAlreadyTakenException("Nom d'utilisateur déjà pris");
+        }
         userDao.add(user);
         return URI.create("users/" + user.getLogin());
     }
 
     public UserResponseDto getUser(String login) throws NameNotFoundException {
+        if (userDao.findOne(login) == null) {
+            throw new NoSuchElementException("Utilisateur non trouvé");
+        }
         return UserResponseDto.of(userDao.findOne(login));
     }
 
-    public void updateUser(String login, User user, String origin, HttpServletResponse response) {
+    public void updateUser(String login, User user, String origin, HttpServletResponse response) throws NameNotFoundException {
+
         userDao.update(login, user);
         String token = userTokenProvider.generateToken(user, origin);
         response.addHeader("Authorization", "Bearer " + token);
     }
 
     public void deleteUser(String login) throws NameNotFoundException {
+        if (userDao.findOne(login) == null) {
+            throw new NoSuchElementException("Utilisateur non trouvé");
+        }
         userDao.deleteById(login);
     }
 }
