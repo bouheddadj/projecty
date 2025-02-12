@@ -49,11 +49,15 @@ public class UserOperationService {
      * @param username le login de l'utilisateur à déconnecter (supposé positionné
      *                 dans les attributs de la requête)
      */
-    public void logout(String username) {
-        try {
-            userDao.findOne(username).disconnect();
-        } catch (NameNotFoundException ignored) {
+    public void logout(String username) throws AuthenticationException, NameNotFoundException {
+        User user = userDao.findOne(username);
+        if (user == null) {
+            throw new NameNotFoundException();
         }
+        if (!user.isConnected()) {
+            throw new AuthenticationException();
+        }
+        user.disconnect();
     }
 
     /**

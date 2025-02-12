@@ -29,6 +29,7 @@ public class UserTokenProvider {
 
     /**
      * Génère un token pour un utilisateur "simple".
+     *
      * @param user L'utilisateur (login et d'autres claims seront dans le token).
      * @return Le token généré.
      */
@@ -49,7 +50,9 @@ public class UserTokenProvider {
 
     /**
      * Génère un token avec les propriétés passées en paramètres.
-     * @param claims Une <code>Map&lt;String, Object&gt;</code> contenant les propriétés à ajouter comme claims.
+     *
+     * @param claims Une <code>Map&lt;String, Object&gt;</code> contenant les
+     *               propriétés à ajouter comme claims.
      * @return Le token généré.
      */
     public String generateToken(Map<String, Object> claims) {
@@ -66,8 +69,10 @@ public class UserTokenProvider {
 
     /**
      * Vérifie que le token est valide par rapport à la clé.
+     *
      * @param token Une <code>String</code> contenant un JWT.
-     * @return True si le paramètre est bien un token JWT et s'il a pu être correctement vérifié, false sinon.
+     * @return True si le paramètre est bien un token JWT et s'il a pu être
+     *         correctement vérifié, false sinon.
      */
     public boolean validateToken(String token, String origin) {
         try {
@@ -83,8 +88,10 @@ public class UserTokenProvider {
 
     /**
      * Renvoie l'ensemble des claims contenus dans le token.
+     *
      * @param token Le JWT à analyser
-     * @return Un ensemble de <code>Claims</code> (hérite de <code>Map&lt;String, Object&gt;</code>)
+     * @return Un ensemble de <code>Claims</code> (hérite de
+     *         <code>Map&lt;String, Object&gt;</code>)
      */
     public Claims getClaimsFromToken(String token) {
         return Jwts.parser()
@@ -96,6 +103,7 @@ public class UserTokenProvider {
 
     /**
      * Récupère le login de l'utilisateur (dans le claim "subject" du token JWT).
+     *
      * @param token Un token JWT qui contient un claim 'sub'
      * @return Le contenu du claim 'sub'
      */
@@ -104,11 +112,14 @@ public class UserTokenProvider {
     }
 
     /**
-     * Permet de récupérer un claim, casté dans un format particulier (Serializable).
-     * @param token Un token JWT
+     * Permet de récupérer un claim, casté dans un format particulier
+     * (Serializable).
+     *
+     * @param token     Un token JWT
      * @param claimName Le nom du claim recherché
-     * @param clazz La classe de l'objet sérialisé initialement dans le claim
-     * @return Une instance de <code>clazz</code> possédant les propriétés contenues dans le claim
+     * @param clazz     La classe de l'objet sérialisé initialement dans le claim
+     * @return Une instance de <code>clazz</code> possédant les propriétés contenues
+     *         dans le claim
      * @param <T> Type paramétrable correspondant à <code>clazz</code>
      */
     public <T> T extractClaim(String token, String claimName, Class<T> clazz) {
@@ -117,6 +128,7 @@ public class UserTokenProvider {
 
     /**
      * Vérifie si un token JWT est expiré ou non.
+     *
      * @param token Un token JWT
      * @return Un booléen qui indique si la date d'expiration est dépassée
      */
@@ -126,6 +138,7 @@ public class UserTokenProvider {
 
     /**
      * Renvoie la date d'expiration d'un token JWT.
+     *
      * @param token Un token JWT
      * @return La date d'expiration du token
      */
@@ -135,13 +148,15 @@ public class UserTokenProvider {
 
     /**
      * Indique si l'utilisateur est déjà connecté.
-     * Si c'est le cas, ajoute un attribut "username" à la requête pour simplifier les traitements ultérieurs.
+     * Si c'est le cas, ajoute un attribut "username" à la requête pour simplifier
+     * les traitements ultérieurs.
+     *
      * @param request la requête contenant les informations de connexion éventuelle
      * @return un booléen ...
      */
     public boolean isUserConnected(HttpServletRequest request) {
         String jwt = request.getHeader("Authorization");
-        if(jwt != null && jwt.startsWith("Bearer ")) {
+        if (jwt != null && jwt.startsWith("Bearer ")) {
             try {
                 jwt = jwt.substring(7);
                 String origin = extractClaim(jwt, ORIGIN_CLAIM_NAME, String.class);

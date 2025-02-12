@@ -78,9 +78,19 @@ public class UsersOperationsController {
      * Réalise la déconnexion.
      */
     @PostMapping("/logout")
-    public ResponseEntity<Void> login(@RequestAttribute("username") String username) {
-        userOperationService.logout(username);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<String> login(@RequestAttribute("username") String username) {
+        try {
+            userOperationService.logout(username);
+            return ResponseEntity.noContent().build();
+        } catch (AuthenticationException e) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "L'utilisateur " + username + " n'est pas connecté.");
+        } catch (NameNotFoundException e) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Utilisateur " + username + " inconnu.");
+        }
     }
 
     /**
