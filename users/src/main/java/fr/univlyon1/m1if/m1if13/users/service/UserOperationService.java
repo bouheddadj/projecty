@@ -13,7 +13,7 @@ import javax.naming.NameNotFoundException;
 
 /**
  * Méthodes de service du contrôleur d'opérations sur les utilisateurs.
-  */
+ */
 @Service
 public class UserOperationService {
 
@@ -23,13 +23,19 @@ public class UserOperationService {
     private UserDao userDao;
 
     /**
-     * Méthode réalisant le login : valide le contenu de la requête et place les informations sur l'utilisateur dans une Map en attribut de requête.
-     * @param dto L'utilisateur trouvé dans le DAO
-     * @param response La réponse (nécessaire pour rajouter le header "Authorization" avec le token JWT).
-     * @throws NameNotFoundException Si le login de l'utilisateur ne correspond pas à un utilisateur existant
-     * @throws MatchException Si la vérification des credentials de l'utilisateur a échoué.
+     * Méthode réalisant le login : valide le contenu de la requête et place les
+     * informations sur l'utilisateur dans une Map en attribut de requête.
+     *
+     * @param dto      L'utilisateur trouvé dans le DAO
+     * @param response La réponse (nécessaire pour rajouter le header
+     *                 "Authorization" avec le token JWT).
+     * @throws NameNotFoundException Si le login de l'utilisateur ne correspond pas
+     *                               à un utilisateur existant
+     * @throws MatchException        Si la vérification des credentials de
+     *                               l'utilisateur a échoué.
      */
-    public void login(LoginRequestDto dto, String origin, HttpServletResponse response) throws NameNotFoundException, AuthenticationException {
+    public void login(LoginRequestDto dto, String origin, HttpServletResponse response)
+            throws NameNotFoundException, AuthenticationException {
         User user = userDao.findOne(dto.login());
         user.authenticate(dto.password());
 
@@ -39,11 +45,27 @@ public class UserOperationService {
 
     /**
      * Méthode appelant la déconnexion dans le <code>ConnectionManager</code>.
-     * @param username le login de l'utilisateur à déconnecter (supposé positionné dans les attributs de la requête)
+     *
+     * @param username le login de l'utilisateur à déconnecter (supposé positionné
+     *                 dans les attributs de la requête)
      */
     public void logout(String username) {
         try {
             userDao.findOne(username).disconnect();
-        } catch (NameNotFoundException ignored) {}
+        } catch (NameNotFoundException ignored) {
+        }
+    }
+
+    /**
+     * Méthode qui vérifie si le token du client est valide en le comparant avec le
+     * token du serveur.
+     *
+     * @param tokenClient Le token fourni par le client.
+     * @param origin      L'origine de la requête.
+     *
+     * @return true si le token est valide, false sinon.
+     */
+    public boolean authenticate(String tokenClient, String origin) {
+        return userTokenProvider.validateToken(tokenClient, origin);
     }
 }

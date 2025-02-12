@@ -72,10 +72,16 @@
 			<artifactId>jackson-core</artifactId>
 			<version>2.18.2</version>
 		</dependency>
+		<dependency>
+    	<groupId>org.springframework.boot</groupId>
+    	<artifactId>spring-boot-devtools</artifactId>
+    	<optional>true</optional>
+		</dependency>
 
 	</dependencies>
 
 	<build>
+		<finalName>${artifactId}</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
@@ -110,6 +116,18 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+      	  <groupId>org.apache.tomcat.maven</groupId>
+      	  <artifactId>tomcat7-maven-plugin</artifactId>
+      	  <version>2.2</version>
+      	  <configuration>
+        	  <url>http://localhost:8080/manager/text</url>
+        	  <server>TomcatServer</server>
+        	  <username>admin</username>
+        	  <password>mif03</password>
+					  <path>/</path>
+      	  </configuration>
+    	</plugin>
 		</plugins>
 	</build>
 
