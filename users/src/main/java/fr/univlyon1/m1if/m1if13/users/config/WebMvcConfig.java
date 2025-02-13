@@ -14,13 +14,36 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
         @Override
         public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**")
-                                .allowedOrigins("https://editor-next.swagger.io", "http://localhost",
-                                                "http://127.0.0.1", "http://localhost:8080",
-                                                "https://192.168.75.XXX", "http://192.168.75.XXX:8080")
-                                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+
+                String[] origins = {
+                                "http://localhost",
+                                "http://192.168.75.XX",
+                                "https://192.168.75.XX" };
+
+                registry
+                                .addMapping("/users/{login}")
+                                .allowedOrigins(origins)
+                                .allowCredentials(true)
+                                .maxAge(3600)
+                                .allowedMethods("GET")
                                 .allowedHeaders("Authorization", "Content-Type")
-                                .exposedHeaders("Authorization", "Content-Type", "Location", "Link")
-                                .allowCredentials(true).maxAge(3600);
+                                .exposedHeaders("Authorization",
+                                                "Content-Type", "Location", "Link");
+                registry
+                                .addMapping("/login")
+                                .allowedOrigins(origins)
+                                .allowedMethods("POST")
+                                .allowedHeaders("Authorization", "Content-Type")
+                                .exposedHeaders("Authorization",
+                                                "Content-Type", "Location", "Link")
+                                .maxAge(3600);
+                registry
+                                .addMapping("/logout")
+                                .allowedOrigins(origins)
+                                .allowedMethods("POST")
+                                .allowedHeaders("Authorization", "Content-Type")
+                                .exposedHeaders("Authorization",
+                                                "Content-Type", "Location", "Link")
+                                .maxAge(3600);
         }
 }

@@ -8,8 +8,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.NoSuchElementException;
-
 import javax.naming.AuthenticationException;
 import javax.naming.NameNotFoundException;
 
@@ -39,15 +37,13 @@ public class UserOperationService {
     public void login(LoginRequestDto dto, String origin, HttpServletResponse response)
             throws NameNotFoundException, AuthenticationException {
         User user = userDao.findOne(dto.login());
-        if (user == null) {
-            throw new NoSuchElementException();
-        }
         user.authenticate(dto.password());
-        if(!user.isConnected()) {
+        if (!user.isConnected()) {
             throw new AuthenticationException();
         }
         String jwt = userTokenProvider.generateToken(user, origin);
         response.setHeader("Authorization", "Bearer " + jwt);
+        response.setHeader("Access-Control-Expose-Headers", "Authorization");
     }
 
     /**

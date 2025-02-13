@@ -69,7 +69,7 @@ public class UsersOperationsController {
             throw new ResponseStatusException(
                     HttpStatus.UNAUTHORIZED,
                     "Erreur de correspondance des noms pour l'utilisateur " + loginDto.login() + ".");
-        } catch (NoSuchElementException e) {
+        } catch (NameNotFoundException e) {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND,
                     "Utilisateur " + loginDto.login() + " inconnu.");
