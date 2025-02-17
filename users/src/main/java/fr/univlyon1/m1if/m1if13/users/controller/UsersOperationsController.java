@@ -24,6 +24,7 @@ import javax.naming.NameNotFoundException;
 /**
  * Contrôleur d'opérations métier.
  */
+
 @Controller
 public class UsersOperationsController {
 

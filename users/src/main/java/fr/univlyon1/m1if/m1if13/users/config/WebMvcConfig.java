@@ -18,7 +18,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 String[] origins = {
                                 "http://localhost",
                                 "http://192.168.75.XX",
-                                "https://192.168.75.XX" };
+                                "https://192.168.75.XX",
+                };
 
                 registry
                                 .addMapping("/users/{login}")

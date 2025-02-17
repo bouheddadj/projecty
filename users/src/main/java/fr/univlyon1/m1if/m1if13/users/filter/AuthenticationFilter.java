@@ -31,9 +31,11 @@ public class AuthenticationFilter extends HttpFilter {
     @Override
     protected void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws IOException, ServletException {
+
         // Permet de retrouver la fin de l'URL (après l'URL du contexte) -> indépendant
         // de l'URL de déploiement
         String url = request.getRequestURI().replace(request.getContextPath(), "");
+        System.out.println("URL : " + url);
 
         // Laisse passer les URLs ne nécessitant pas d'authentification et les requêtes
         // par des utilisateurs authentifiés
@@ -42,11 +44,12 @@ public class AuthenticationFilter extends HttpFilter {
                 (url.startsWith("/users/") && request.getMethod().equals("DELETE")) ||
                 (url.equals("/login") && request.getMethod().equals("POST")) ||
                 (url.equals("/authenticate") && request.getMethod().equals("GET")) ||
-                userTokenProvider.isUserConnected(request)) {
+                userTokenProvider.isUserConnected(request) ||
+                url.startsWith("/v3/api-docs") ||
+                url.startsWith("/swagger-ui/")) {
             chain.doFilter(request, response);
             return;
         }
-
         // Bloque les autres requêtes
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Vous devez vous connecter pour accéder au site.");
     }
