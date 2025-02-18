@@ -12,3 +12,7 @@ Merci de modifier ce readme en indiquant :
   - s'il a été fait (ou pas)
   - jusqu'où vous avez été
   - vos choix de conception s'ils ne sont pas évidents
+## TP1 & TP2
+/users/users-api.yaml -> le fichier qui contient la documentation de l'api users
+/users/M1IF13-2025.postman_collection.json -> le fichier qui contient des tests de l'api users
+- http://localhost:8080/swagger-ui/index.html -> la page web qui contient la documentation swagger pour l'api users
