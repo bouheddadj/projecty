@@ -1,0 +1,135 @@
+openapi: 3.1.0
+info:
+  title: API Utilisateurs
+  description: "API de gestion des utilisateurs (connexion, déconnexion, récupération\
+    \ des infos)"
+  version: 1.0.0
+servers:
+- url: http://localhost:8080
+  description: Generated server url
+paths:
+  /users/{userId}:
+    get:
+      tags:
+      - user-resource-controller
+      operationId: getUser
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponseDto"
+            application/xml:
+              schema:
+                $ref: "#/components/schemas/UserResponseDto"
+    put:
+      tags:
+      - user-resource-controller
+      operationId: updateUser
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: Origin
+        in: header
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+          application/xml:
+            schema:
+              $ref: "#/components/schemas/User"
+        required: true
+      responses:
+        "200":
+          description: OK
+    delete:
+      tags:
+      - user-resource-controller
+      operationId: deleteUser
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+  /users:
+    get:
+      tags:
+      - user-resource-controller
+      operationId: getAllUsers
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UsersResponseDto"
+            application/xml:
+              schema:
+                $ref: "#/components/schemas/UsersResponseDto"
+    post:
+      tags:
+      - user-resource-controller
+      operationId: createUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+          application/xml:
+            schema:
+              $ref: "#/components/schemas/User"
+        required: true
+      responses:
+        "200":
+          description: OK
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        login:
+          type: string
+        password:
+          type: string
+          writeOnly: true
+        species:
+          type: string
+          enum:
+          - VOLEUR
+          - POLICIER
+          - ADMIN
+        connected:
+          type: boolean
+        image:
+          type: string
+    UsersResponseDto:
+      type: object
+    UserResponseDto:
+      type: object
+      properties:
+        login:
+          type: string
+        species:
+          type: string
+          enum:
+          - VOLEUR
+          - POLICIER
+          - ADMIN
