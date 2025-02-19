@@ -87,7 +87,7 @@ public class UsersOperationsController {
      * @throws NameNotFoundException
      */
     @PostMapping("/logout")
-    public ResponseEntity<String> login(@RequestAttribute("username") String username) throws NameNotFoundException {
+    public ResponseEntity<String> logout(@RequestAttribute("username") String username) throws NameNotFoundException {
         try {
             userOperationService.logout(username);
             return ResponseEntity.noContent().build();

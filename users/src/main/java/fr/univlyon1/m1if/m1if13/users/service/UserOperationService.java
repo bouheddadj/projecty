@@ -72,7 +72,14 @@ public class UserOperationService {
      *
      * @return true si le token est valide, false sinon.
      */
-    public boolean authenticate(String tokenClient, String origin) {
+    public boolean authenticate(String tokenClient, String origin) throws NameNotFoundException {
+        String username = userTokenProvider.extractUsername(tokenClient);
+        User user = userDao.findOne(username);
+
+        // Vérifie que l'utilisateur est encore connecté.
+        if (user == null || !user.isConnected()) {
+            return false; // Refuse l'authentification si l'utilisateur est déconnecté.
+        }
         return userTokenProvider.validateToken(tokenClient, origin);
     }
 }
