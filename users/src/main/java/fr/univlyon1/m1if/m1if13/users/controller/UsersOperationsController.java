@@ -133,7 +133,8 @@ public class UsersOperationsController {
         } catch (Exception e) {
             throw new ResponseStatusException(
                     HttpStatus.INTERNAL_SERVER_ERROR,
-                    "Un problème est survenu lors de l'authentification des tokens");
+                    e.getMessage());
+
         }
     }
 }
