@@ -69,9 +69,19 @@ public class UsersOperationsController {
      * Réalise la déconnexion.
      */
     @PostMapping("/logout")
-    public ResponseEntity<Void> login(@RequestAttribute("username") String username) {
-        userOperationService.logout(username);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<String> logout(@RequestAttribute("username") String username) {
+        try {
+            userOperationService.logout(username);
+            return ResponseEntity.noContent().build();
+        } catch (AuthenticationException e) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "L'utilisateur " + username + " n'est pas connecté.");
+        } catch (NameNotFoundException e) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Utilisateur " + username + " inconnu.");
+        }
     }
 
     /**
@@ -82,7 +92,18 @@ public class UsersOperationsController {
      */
     @GetMapping(value = "/authenticate", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> authenticate(@RequestParam("jwt") String jwt, @RequestParam("origin") String origin) {
-        // TODO
-        return null;
+        try {
+            if (jwt == null || origin == null) {
+                return ResponseEntity.badRequest().build();
+            }
+            boolean isAuthenticated = userOperationService.authenticate(jwt, origin);
+            if (isAuthenticated) {
+                return ResponseEntity.noContent().build();
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }

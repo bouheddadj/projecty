@@ -41,9 +41,35 @@ public class UserOperationService {
      * Méthode appelant la déconnexion dans le <code>ConnectionManager</code>.
      * @param username le login de l'utilisateur à déconnecter (supposé positionné dans les attributs de la requête)
      */
-    public void logout(String username) {
-        try {
-            userDao.findOne(username).disconnect();
-        } catch (NameNotFoundException ignored) {}
+    public void logout(String username) throws AuthenticationException, NameNotFoundException {
+        User user = userDao.findOne(username);
+        if (user == null) {
+            throw new NameNotFoundException();
+        }
+        if (!user.isConnected()) {
+            throw new AuthenticationException();
+        }
+        user.disconnect();
     }
+
+    /**
+     * Méthode qui vérifie si le token du client est valide en le comparant avec le
+     * token du serveur.
+     *
+     * @param tokenClient Le token fourni par le client.
+     * @param origin      L'origine de la requête.
+     *
+     * @return true si le token est valide, false sinon.
+     */
+    public boolean authenticate(String tokenClient, String origin) throws NameNotFoundException {
+        String username = userTokenProvider.extractUsername(tokenClient);
+        User user = userDao.findOne(username);
+
+        // Vérifie que l'utilisateur est encore connecté.
+        if (user == null || !user.isConnected()) {
+            return false; // Refuse l'authentification si l'utilisateur est déconnecté.
+        }
+        return userTokenProvider.validateToken(tokenClient, origin);
+    }
+
 }
