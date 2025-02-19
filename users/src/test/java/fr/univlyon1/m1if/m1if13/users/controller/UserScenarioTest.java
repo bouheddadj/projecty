@@ -23,37 +23,46 @@ import org.springframework.http.MediaType;
 @AutoConfigureMockMvc
 public class UserScenarioTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+        @Autowired
+        private MockMvc mockMvc;
 
-    @Test
-    void testScenarioController() throws Exception {
+        @Test
+        void testScenarioController() throws Exception {
 
-        /*
-         * We first create a user with the POST method.
-         *
-         * We expect a 201 status code.
-         * The user is created with the following JSON:
-         * login = "Arsene"
-         * password = "montenlair"
-         * species = "VOLEUR"
-         */
-        mockMvc.perform(post("/users")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"login\":\"Arsene\",\"password\":\"montenlair\",\"species\":\"VOLEUR\"}"))
-                .andExpect(status().isCreated());
+                /*
+                 * We first create a user with the POST method.
+                 *
+                 * We expect a 201 status code.
+                 * The user is created with the following JSON:
+                 * login = "Arsene"
+                 * password = "montenlair"
+                 * species = "VOLEUR"
+                 */
+                mockMvc.perform(post("/users")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"login\":\"Arsene\",\"password\":\"montenlair\",\"species\":\"VOLEUR\"}"))
+                                .andExpect(status().isCreated());
 
-        String token = mockMvc.perform(post("/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"login\":\"Arsene\",\"password\":\"montenlair\"}")
-                .header("Origin", "http://localhost"))
-                .andExpect(status().isNoContent())
-                .andReturn().getResponse().getHeader("Authorization");
+                String token = mockMvc.perform(post("/login")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"login\":\"Arsene\",\"password\":\"montenlair\"}")
+                                .header("Origin", "http://localhost"))
+                                .andExpect(status().isNoContent())
+                                .andReturn().getResponse().getHeader("Authorization");
+                token = token.replace("Bearer ", "");
 
-        mockMvc.perform(get("/users/Arsene")
-                .header("Authorization",
-                        token)
-                .header("Origin", "http://localhost"))
-                .andExpect(status().isOk());
-    }
+                mockMvc.perform(get("/authenticate")
+                                .header("Authorization", token)
+                                .header("Origin",
+                                                "http://localhost")
+                                .param("jwt", token)
+                                .param("origin", "http://localhost"))
+                                .andExpect(status().isNoContent());
+
+                mockMvc.perform(get("/users/Arsene")
+                                .header("Authorization",
+                                                token)
+                                .header("Origin", "http://localhost"))
+                                .andExpect(status().isOk());
+        }
 }
