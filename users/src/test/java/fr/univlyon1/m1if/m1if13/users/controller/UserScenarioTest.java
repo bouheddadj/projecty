@@ -49,13 +49,10 @@ public class UserScenarioTest {
                                 .header("Origin", "http://localhost"))
                                 .andExpect(status().isNoContent())
                                 .andReturn().getResponse().getHeader("Authorization");
-                token = token.replace("Bearer ", "");
+                String tokenAuthenticate = token.replace("Bearer ", "");
 
                 mockMvc.perform(get("/authenticate")
-                                .header("Authorization", token)
-                                .header("Origin",
-                                                "http://localhost")
-                                .param("jwt", token)
+                                .param("jwt", tokenAuthenticate)
                                 .param("origin", "http://localhost"))
                                 .andExpect(status().isNoContent());
 
