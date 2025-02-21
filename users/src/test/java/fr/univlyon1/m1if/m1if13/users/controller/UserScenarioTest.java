@@ -1,5 +1,6 @@
 package fr.univlyon1.m1if.m1if13.users.controller;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -23,9 +24,22 @@ import org.springframework.http.MediaType;
 @AutoConfigureMockMvc
 public class UserScenarioTest {
 
+        //Tests unitaires
+        @Autowired
+        private UserResourceController userResourceController;
+
+        @Autowired
+        private UsersOperationsController usersOperationsController;
+
+        @Test
+        void contextLoad() {
+                assertThat(userResourceController).isNotNull();
+                assertThat(usersOperationsController).isNotNull();
+        }
+
+        // Tests d'intégration
         @Autowired
         private MockMvc mockMvc;
-
         @Test
         void testScenarioController() throws Exception {
 
