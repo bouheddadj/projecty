@@ -41,12 +41,12 @@ public class AuthenticationFilter extends HttpFilter {
         // par des utilisateurs authentifiés
         if ((request.getMethod().equals("OPTIONS")) ||
                 url.equals("/users") ||
+                url.startsWith("/v3/api-docs") ||
+                url.startsWith("/swagger-ui/") ||
+                userTokenProvider.isUserConnected(request) ||
                 (url.startsWith("/users/") && request.getMethod().equals("DELETE")) ||
                 (url.equals("/login") && request.getMethod().equals("POST")) ||
-                (url.equals("/authenticate") && request.getMethod().equals("GET")) ||
-                userTokenProvider.isUserConnected(request) ||
-                url.startsWith("/v3/api-docs") ||
-                url.startsWith("/swagger-ui/")) {
+                (url.equals("/authenticate") && request.getMethod().equals("GET"))) {
             chain.doFilter(request, response);
             return;
         }

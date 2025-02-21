@@ -60,6 +60,7 @@ public class UserOperationService {
         if (!user.isConnected()) {
             throw new AuthenticationException();
         }
+
         user.disconnect();
     }
 

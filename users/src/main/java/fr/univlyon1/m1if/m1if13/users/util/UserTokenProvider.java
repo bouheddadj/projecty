@@ -1,9 +1,12 @@
 package fr.univlyon1.m1if.m1if13.users.util;
 
+import fr.univlyon1.m1if.m1if13.users.dao.UserDao;
 import fr.univlyon1.m1if.m1if13.users.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.HttpServletRequest;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -23,6 +26,9 @@ public class UserTokenProvider {
 
     @Value("${jwt.expirationMs}")
     private int jwtExpirationMs;
+
+    @Autowired
+    private UserDao userDao;
 
     public UserTokenProvider() {
     }
@@ -160,7 +166,7 @@ public class UserTokenProvider {
             try {
                 jwt = jwt.substring(7);
                 String origin = extractClaim(jwt, ORIGIN_CLAIM_NAME, String.class);
-                if (validateToken(jwt, origin)) {
+                if (validateToken(jwt, origin) && userDao.findOne(extractUsername(jwt)).isConnected()) {
                     request.setAttribute("username", extractUsername(jwt));
                     return true;
                 }

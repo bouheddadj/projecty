@@ -140,6 +140,8 @@ public class UserScenarioTest {
                                 .header("Origin", "http://localhost"))
                                 .andExpect(status().isNoContent());
 
+                // La requête GET doit renvoyer un code 401 (On essaie de récupérer les infos
+                // du user)
                 mockMvc.perform(get("/users/Arsene")
                                 .header("Authorization", token)
                                 .header("Origin", "http://localhost"))

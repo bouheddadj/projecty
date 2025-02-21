@@ -52,7 +52,8 @@ public class UserResourceService {
         return UserResponseDto.of(userDao.findOne(login));
     }
 
-    public void updateUser(String login, User user, String origin, HttpServletResponse response) throws NameNotFoundException {
+    public void updateUser(String login, User user, String origin, HttpServletResponse response)
+            throws NameNotFoundException {
 
         userDao.update(login, user);
         String token = userTokenProvider.generateToken(user, origin);
