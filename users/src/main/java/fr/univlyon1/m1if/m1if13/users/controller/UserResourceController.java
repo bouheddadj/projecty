@@ -22,6 +22,7 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.naming.NameAlreadyBoundException;
 import javax.naming.NameNotFoundException;
 import java.net.URI;
+import java.util.NoSuchElementException;
 
 /**
  * Aiguillage des requêtes liées aux ressources des utilisateurs.
@@ -33,38 +34,52 @@ public class UserResourceController {
     @Autowired
     private UserResourceService userResourceService;
 
-    @GetMapping(produces = {"application/json", "application/xml"})
+    @GetMapping(produces = { "application/json", "application/xml" })
     public ResponseEntity<UsersResponseDto> getAllUsers() {
-        return ResponseEntity.ok(userResourceService.getAllUsersDto());
-    }
-
-    @PostMapping(consumes = {"application/json", "application/xml"})
-    public ResponseEntity<Void> createUser(@RequestBody User user) {
         try {
-            return ResponseEntity.created(userResourceService.createUser(user)).build();
-        } catch (NameAlreadyBoundException e) {
+            return ResponseEntity.ok(userResourceService.getAllUsersDto());
+        } catch (Exception e) {
             throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
-                    "Un utilisateur avec le login " + user.getLogin() + " existe déjà."
-            );
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Un problème est survenu lors de la récupération des utilisateurs.");
         }
     }
 
-    @GetMapping(value = "/{userId}", produces = {"application/json", "application/xml"})
+    @PostMapping(consumes = { "application/json", "application/xml" })
+    public ResponseEntity<Void> createUser(@RequestBody User user)
+            throws NameNotFoundException, NameAlreadyBoundException {
+        try {
+            return ResponseEntity.created(userResourceService.createUser(user)).build();
+        } catch (NameNotFoundException e) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    e.getMessage());
+        } catch (Exception e) {
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    e.getMessage());
+        }
+    }
+
+    @GetMapping(value = "/{userId}", produces = { "application/json", "application/xml" })
     public ResponseEntity<UserResponseDto> getUser(@PathVariable String userId) {
         try {
             return ResponseEntity.ok(userResourceService.getUser(userId));
-        } catch (NameNotFoundException e) {
+        } catch (NoSuchElementException e) {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND,
-                    "Utilisateur " + userId + " inconnu."
-            );
+                    "Utilisateur non trouvé.");
+        } catch (Exception e) {
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Un problème est survenu lors de la récupération de l'utilisateur.");
         }
     }
 
-    @PutMapping(value = "/{userId}", consumes = {"application/json", "application/xml"})
+    @PutMapping(value = "/{userId}", consumes = { "application/json", "application/xml" })
     public ResponseEntity<Void> updateUser(
-            @PathVariable String userId, @RequestBody User user, @RequestHeader("Origin") String origin, HttpServletResponse response) {
+            @PathVariable String userId, @RequestBody User user, @RequestHeader("Origin") String origin,
+            HttpServletResponse response) throws NameNotFoundException {
         try {
             userResourceService.createUser(user);
             return ResponseEntity.created(URI.create("users/" + userId)).build();
@@ -78,7 +93,15 @@ public class UserResourceController {
     public ResponseEntity<Void> deleteUser(@PathVariable String userId) {
         try {
             userResourceService.deleteUser(userId);
-        } catch (NameNotFoundException ignored) { }
-        return ResponseEntity.noContent().build();
+            return ResponseEntity.noContent().build();
+        } catch (NoSuchElementException e) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Utilisateur non trouvé.");
+        } catch (Exception e) {
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Un problème est survenu lors de la suppression de l'utilisateur.");
+        }
     }
 }
