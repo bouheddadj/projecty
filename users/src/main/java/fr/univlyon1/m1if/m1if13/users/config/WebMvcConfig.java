@@ -18,6 +18,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 String[] origins = {
                                 "http://localhost",
                                 "http://127.0.0.1:5500", // temporaire pour les tests en local
+                                "https://192.168.75.33",
                                 "http://192.168.75.33:8443",
                                 "https://192.168.75.33:8443",
                 };
