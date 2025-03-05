@@ -46,4 +46,4 @@ deploy_express:
     - main
   script:
     - scp -o StrictHostKeyChecking=no -i $CI_SSH_KEY -r express/* gitlabci@192.168.75.33:/opt/express
-    - ssh -o StrictHostKeyChecking=no -i $CI_SSH_KEY gitlabci@192.168.75.33 "cd /opt/express && npm install && pm2 restart all"
+    - ssh -o StrictHostKeyChecking=no -i $CI_SSH_KEY gitlabci@192.168.75.33 "cd /opt/express && npm install && pm2 start server.js"
