@@ -37,8 +37,7 @@ deploy_api:
   only:
     - main
   script:
-    # L'option -f de scp force l'écrasement des fichiers existants
-    - scp -f -o StrictHostKeyChecking=no -i $CI_SSH_KEY users/target/users.war gitlabci@192.168.75.33:$API_DEPLOY_PATH
+    - scp -o StrictHostKeyChecking=no -i $CI_SSH_KEY users/target/users.war gitlabci@192.168.75.33:$API_DEPLOY_PATH
 
 # Deploy Express Server
 deploy_express:
