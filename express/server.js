@@ -1,30 +1,29 @@
 const express = require("express");
 const jwtDecode = require("jwt-decode");
 
-// // Direct implementation of JWT decoder to avoid package issues
-// function decodeJWT(token) {
-//   try {
-//     const parts = token.split(".");
-//     if (parts.length !== 3) {
-//       throw new Error("JWT must have 3 parts");
-//     }
-
-//     const base64Url = parts[1];
-//     const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-//     const jsonPayload = Buffer.from(base64, "base64").toString("utf8");
-
-//     console.log("Decoded payload:", jsonPayload);
-//     return JSON.parse(jsonPayload);
-//   } catch (error) {
-//     console.error("Error decoding JWT:", error.message);
-//     throw error;
-//   }
-// }
-
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 const DEFAULT_ORIGIN = "http://localhost";
+
+// Middleware pour désactiver les restrictions CORS
+app.use((req, res, next) => {
+  // Autoriser toutes les origines
+  res.setHeader("Access-Control-Allow-Origin", "*");
+
+  // Autoriser tous les en-têtes
+  res.setHeader("Access-Control-Allow-Headers", "*");
+
+  // Autoriser toutes les méthodes HTTP
+  res.setHeader("Access-Control-Allow-Methods", "*");
+
+  // Répondre immédiatement aux requêtes préliminaires OPTIONS
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+
+  next();
+});
 
 app.get("/", (req, res) => {
   const authHeader = req.headers["authorization"];
