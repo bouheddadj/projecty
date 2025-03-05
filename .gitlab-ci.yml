@@ -38,3 +38,12 @@ deploy_api:
     - main
   script:
     - scp -o StrictHostKeyChecking=no -i $CI_SSH_KEY users/target/users.war gitlabci@192.168.75.33:$API_DEPLOY_PATH
+
+# Deploy Express Server
+deploy_express:
+  stage: deploy
+  only:
+    - main
+  script:
+    - scp -o StrictHostKeyChecking=no -i $CI_SSH_KEY -r express/* gitlabci@192.168.75.33:/opt/express
+    - ssh -o StrictHostKeyChecking=no -i $CI_SSH_KEY gitlabci@192.168.75.33 "cd /opt/express && npm install && pm2 restart all"
