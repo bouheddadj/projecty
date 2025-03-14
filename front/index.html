@@ -91,11 +91,10 @@
 
           try {
             const response = await fetch("http://localhost:3000", {
-              // a modifier
               method: "GET",
               headers: {
                 Authorization: token,
-                Origin: "http://localhost", // a modifier
+                Origin: window.location.origin,
               },
             });
 
