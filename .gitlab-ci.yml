@@ -54,4 +54,4 @@ deploy_front:
   only:
     - main
   script:
-    - scp -r -o StrictHostKeyChecking=no -i $CI_SSH_KEY ./front/* gitlabci@192.168.75.33:/var/www/html/
+    - scp -r -o StrictHostKeyChecking=no -i $CI_SSH_KEY ./front/* gitlabci@192.168.75.33:/usr/share/nginx/html
