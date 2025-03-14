@@ -4,8 +4,6 @@ const jwtDecode = require("jwt-decode");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const DEFAULT_ORIGIN = "http://localhost";
-
 // Middleware pour désactiver les restrictions CORS
 app.use((req, res, next) => {
   // Autoriser toutes les origines
@@ -27,7 +25,8 @@ app.use((req, res, next) => {
 
 app.get("/", (req, res) => {
   const authHeader = req.headers["authorization"];
-  const origin = req.headers["origin"] || DEFAULT_ORIGIN;
+  const origin = req.headers["origin"];
+  console.log(`Authorization: ${authHeader}`);
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return res.status(401).json({ error: "Token manquant ou invalide" });
@@ -45,6 +44,7 @@ app.get("/", (req, res) => {
     }
 
     if (decodedToken.origin && decodedToken.origin !== origin) {
+      conso;
       return res.status(403).json({ error: "Origine non autorisée" });
     }
 
