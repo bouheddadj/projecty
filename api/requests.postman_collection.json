@@ -1,0 +1,142 @@
+{
+	"info": {
+		"name": "API Tests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get Home",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "3000",
+					"path": [""]
+				}
+			}
+		},
+		{
+			"name": "Get Static",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/static",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "3000",
+					"path": ["static"]
+				}
+			}
+		},
+		{
+			"name": "Get All Resources",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/game/resources",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "3000",
+					"path": ["api", "game", "resources"]
+				}
+			}
+		},
+		{
+			"name": "Get Resource by ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/game/ressource/:id",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "3000",
+					"path": ["api", "game", "ressource", ":id"],
+					"variable": [
+						{
+							"key": "id",
+							"value": "1"
+						}
+					]
+				}
+			}
+		},
+		{
+			"name": "Post Resource Operation",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"operationType\": \"example\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/game/resources/:resourceId",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "3000",
+					"path": ["api", "game", "resources", ":resourceId"],
+					"variable": [
+						{
+							"key": "resourceId",
+							"value": "1"
+						}
+					]
+				}
+			}
+		},
+		{
+			"name": "Put Resource Position",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"position\": \"example\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/game/resources/:resourceId/position",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "3000",
+					"path": ["api", "game", "resources", ":resourceId", "position"],
+					"variable": [
+						{
+							"key": "resourceId",
+							"value": "1"
+						}
+					]
+				}
+			}
+		},
+		{
+			"name": "Get ZRR Limits",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/game/zrr",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "3000",
+					"path": ["api", "game", "zrr"]
+				}
+			}
+		}
+	]
+}
