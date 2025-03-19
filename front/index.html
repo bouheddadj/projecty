@@ -1,118 +1,131 @@
 <!DOCTYPE html>
 <html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Authentification</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        text-align: center;
-        margin: 50px;
-      }
-      input,
-      button {
-        margin: 5px;
-        padding: 10px;
-      }
-      #continueBtn,
-      #result {
-        display: none;
-      }
-    </style>
-  </head>
-  <body>
-    <h2>Connexion</h2>
-    <form id="loginForm">
-      <input
-        type="text"
-        id="login"
-        placeholder="Nom d'utilisateur"
-        required
-      /><br />
-      <input
-        type="password"
-        id="password"
-        placeholder="Mot de passe"
-        required
-      /><br />
-      <button type="submit">Se connecter</button>
-    </form>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Authentification</title>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+				text-align: center;
+				margin: 50px;
+			}
+			input,
+			button {
+				margin: 5px;
+				padding: 10px;
+			}
+			#continueBtn,
+			#result {
+				display: none;
+			}
+		</style>
+	</head>
+	<body>
+		<h2>Connexion</h2>
+		<form id="loginForm">
+			<input
+				type="text"
+				id="login"
+				placeholder="Nom d'utilisateur"
+				required /><br />
+			<input
+				type="password"
+				id="password"
+				placeholder="Mot de passe"
+				required /><br />
+			<button type="submit">Se connecter</button>
+		</form>
 
-    <button id="continueBtn">Continuer</button>
-    <p id="result"></p>
+		<button id="continueBtn">Continuer</button>
+		<p id="result"></p>
 
-    <script>
-      let token = null;
+		<script>
+			let token = null;
+			let URL_USERS_API = '';
+			let URL_EXPRESS = '';
 
-      document
-        .getElementById("loginForm")
-        .addEventListener("submit", async function (event) {
-          event.preventDefault();
+			(async function fetchConfig() {
+				try {
+					const configResponse = await fetch('config.json');
+					const config = await configResponse.json();
+					URL_USERS_API = config.URL_USERS_API;
+					URL_EXPRESS = config.URL_EXPRESS;
+				} catch (error) {
+					alert(
+						'Erreur lors du chargement de la configuration : ' + error.message
+					);
+				}
+			})();
 
-          const login = document.getElementById("login").value;
-          const password = document.getElementById("password").value;
+			document
+				.getElementById('loginForm')
+				.addEventListener('submit', async function (event) {
+					event.preventDefault();
 
-          try {
-            const response = await fetch(
-              "https://192.168.75.33:8443/users/login",
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ login, password }),
-              }
-            );
+					const login = document.getElementById('login').value;
+					const password = document.getElementById('password').value;
 
-            if (!response.ok) {
-              throw new Error("Échec de l'authentification");
-            }
+					try {
+						const response = await fetch(`${URL_USERS_API}/login`, {
+							method: 'POST',
+							headers: {
+								'Content-Type': 'application/json',
+							},
+							body: JSON.stringify({ login, password }),
+						});
 
-            token = response.headers.get("Authorization");
-            if (!token) {
-              throw new Error("Token JWT introuvable");
-            }
+						if (!response.ok) {
+							throw new Error("Échec de l'authentification");
+						}
 
-            alert("Connexion réussie !");
-            document.getElementById("continueBtn").style.display = "block";
-          } catch (error) {
-            alert("Erreur : " + error.message);
-          }
-        });
+						token = response.headers.get('Authorization');
+						if (!token) {
+							throw new Error('Token JWT introuvable');
+						}
 
-      document
-        .getElementById("continueBtn")
-        .addEventListener("click", async function () {
-          if (!token) {
-            alert("Erreur : Aucun token disponible !");
-            return;
-          }
+						alert('Connexion réussie !');
+						document.getElementById('continueBtn').style.display = 'block';
+					} catch (error) {
+						alert('Erreur : ' + error.message);
+					}
+				});
 
-          try {
-            const response = await fetch("https://192.168.75.33/express", {
-              method: "GET",
-              headers: {
-                Authorization: token,
-                Origin: window.location.origin,
-              },
-            });
+			async function sendToken() {
+				try {
+					const response = await fetch(`${URL_EXPRESS}`, {
+						method: 'GET',
+						headers: {
+							Authorization: token,
+							Origin: window.location.origin,
+						},
+					});
 
-            if (response.status === 204) {
-              document.getElementById("result").textContent =
-                "Succès, mais pas de contenu renvoyé.";
-            } else if (!response.ok) {
-              throw new Error("Accès refusé ou erreur serveur.");
-            } else {
-              const text = await response.text();
-              document.getElementById("result").textContent = text;
-            }
+					if (response.status === 204) {
+						document.getElementById('result').textContent =
+							'Succès, mais pas de contenu renvoyé.';
+					} else if (!response.ok) {
+						throw new Error('Accès refusé ou erreur serveur.');
+					} else {
+						const text = await response.text();
+						document.getElementById('result').textContent = text;
+					}
 
-            document.getElementById("result").style.display = "block";
-          } catch (error) {
-            alert("Erreur lors de l'accès à Express : " + error.message);
-          }
-        });
-    </script>
-  </body>
+					document.getElementById('result').style.display = 'block';
+				} catch (error) {
+					alert("Erreur lors de l'accès à Express : " + error.message);
+				}
+			}
+
+			document
+				.getElementById('continueBtn')
+				.addEventListener('click', async function () {
+					if (!token) {
+						alert('Erreur : Aucun token disponible !');
+						return;
+					}
+					sendToken();
+				});
+		</script>
+	</body>
 </html>
