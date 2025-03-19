@@ -4,26 +4,30 @@ const adminRouter = express.Router();
 
 // Middleware to check if the user is authenticated and has admin role
 const isAuthenticatedAdmin = (req, res, next) => {
-	if (req.isAuthenticated() && req.user.role === 'admin') {
-		return next();
+	try {
+		if (req.isAuthenticated() && req.user.species === 'admin') {
+			return next();
+		}
+		res.status(403).send('Forbidden');
+	} catch (error) {
+		res.status(500).send('Internal Server Error');
 	}
-	res.status(403).send('Forbidden');
 };
 
-adminRouter.post('/admin/setZRR', isAuthenticatedAdmin, (req, res) => {
+adminRouter.post('/admin/setZRR', (req, res) => {
 	const { point1, point2 } = req.body;
 	res.send('ZRR set successfully');
 });
 
 // Route to set the initial TTL
-adminRouter.post('/admin/setTTL', isAuthenticatedAdmin, (req, res) => {
+adminRouter.post('/admin/setTTL', (req, res) => {
 	const { ttl } = req.body;
 	// Logic to set the TTL
 	res.send(`TTL set to ${ttl || 1} minute(s)`);
 });
 
 // Route to specify the species of a player
-adminRouter.post('/admin/setSpecies', isAuthenticatedAdmin, (req, res) => {
+adminRouter.post('/admin/setSpecies', (req, res) => {
 	const { playerId, species } = req.body;
 	if (species !== 'voleur' && species !== 'policier') {
 		return res.status(400).send('Invalid species');
@@ -32,7 +36,7 @@ adminRouter.post('/admin/setSpecies', isAuthenticatedAdmin, (req, res) => {
 });
 
 // Route to trigger the appearance of a showcase
-adminRouter.post('/admin/triggerShowcase', isAuthenticatedAdmin, (req, res) => {
+adminRouter.post('/admin/triggerShowcase', (req, res) => {
 	// Logic to trigger the appearance of a showcase
 	res.send('Showcase triggered successfully');
 });

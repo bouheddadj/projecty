@@ -5,7 +5,7 @@ stages:
   - deploy
 
 variables:
-  API_DEPLOY_PATH: "/opt/tomcat/webapps/users.war"
+  API_DEPLOY_PATH: '/opt/tomcat/webapps/users.war'
 
 before_script:
   - chmod +x ci/setup-mvn-proxy.sh
@@ -48,10 +48,19 @@ deploy_express:
     - scp -r -o StrictHostKeyChecking=no -i $CI_SSH_KEY ./express/* gitlabci@192.168.75.33:/opt/express
     - ssh -o StrictHostKeyChecking=no -i $CI_SSH_KEY gitlabci@192.168.75.33 "cd /opt/express && pm2 stop server.js && npm install && pm2 restart server.js"
 
+# # Deploy api-game
+# deploy_game:
+#   stage: deploy
+#   only:
+#     - main
+#   script:
+#     - scp -r -o StrictHostKeyChecking=no -i $CI_SSH_KEY ./api/* gitlabci@192.168.75.33:/opt/express
+#     - ssh -o StrictHostKeyChecking=no -i $CI_SSH_KEY gitlabci@192.168.75.33 "cd /opt/express && pm2 stop api.js && npm install && pm2 restart server.js"
+
 # Deploy front-end
 deploy_front:
   stage: deploy
   only:
     - main
   script:
-    - scp -r -o StrictHostKeyChecking=no -i $CI_SSH_KEY ./front/* gitlabci@192.168.75.33:/usr/share/nginx/html
+    - scp -r -o StrictHostKeyChecking=no -i $CI_SSH_KEY ./front/index.html gitlabci@192.168.75.33:/usr/share/nginx/html

@@ -227,3 +227,4 @@ dist
 .pnp.*
 
 config.json
+package-lock.json
