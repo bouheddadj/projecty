@@ -1,84 +1,120 @@
 import express from 'express';
+import fs from 'fs';
+import path from 'path';
 
 const gameRouter = express.Router();
 
-let URL_USERS_API = '';
-let URL_EXPRESS = '';
+// data game
+const dataFilePath = path.resolve('data.json');
 
-(async function fetchConfig() {
+const readData = () => {
 	try {
-		const configResponse = await fetch('config.json');
-		const config = await configResponse.json();
-		URL_USERS_API = config.URL_USERS_API;
-		URL_EXPRESS = config.URL_EXPRESS;
-	} catch (error) {
-		return error;
-	}
-})();
-
-// Middleware qui verifie si l'utilisateur est authentifié
-// On envoie une requete avec le token dans le header vers l'api user sur le endpoints /authenticate
-// Non tester
-const isAuthenticated = async (req, res, next) => {
-	try {
-		const authHeader = req.headers['authorization'];
-		const origin = req.headers['origin'];
-
-		if (!authHeader || !authHeader.startsWith('Bearer ') || !origin) {
-			return res.status(401).json({ error: 'Unauthorized' });
-		}
-
-		const response = await fetch(`${URL_USERS_API}/authenticate`, {
-			headers: { Authorization: authHeader, Origin: origin },
-		});
-
-		if (response.status === 204) {
-			return next();
-		} else {
-			return res.status(401).json({ error: 'Unauthorized' });
-		}
-	} catch (error) {
-		return res.status(500).json({ error: 'Internal Server Error' });
+		const data = fs.readFileSync(dataFilePath, 'utf-8');
+		return JSON.parse(data);
+	} catch {
+		return {};
 	}
 };
 
-gameRouter.get('/ressource', isAuthenticated, (req, res) => {
-	// Logic to get resource
+const writeData = (data) => {
+	fs.writeFileSync(dataFilePath, JSON.stringify(data, null, 2), 'utf-8');
+};
+
+gameRouter.get('/ressource', (req, res) => {
 	res.json({ message: 'Resource fetched successfully' });
 });
 
-gameRouter.get('/ressource/:id', isAuthenticated, (req, res) => {
-	// Logic to get resource by id
+gameRouter.get('/ressource/:id', (req, res) => {
 	res.json({ message: `Resource ${req.params.id} fetched successfully` });
 });
 
-gameRouter.get('/ressource/:id/position', isAuthenticated, (req, res) => {
-	// Logic to get resource's position
-	// User have to be authenticated
+gameRouter.get('/ressource/:id/position', (req, res) => {
+	res.json({
+		message: `Resource ${req.params.id} position fetched successfully`,
+	});
 });
 
-gameRouter.get('/resources', isAuthenticated, (req, res) => {
-	// Logic to get all resources
-	// User have to be authenticated
+gameRouter.get('/resources', (req, res) => {
+	const data = readData();
+	const resources = data.players.concat(data.vitrines || []);
+	res.json(resources);
 });
 
-gameRouter.post('/resources/:resourceId', isAuthenticated, (req, res) => {
-	// Logic to create a resource
-	// User have to be authenticated
+gameRouter.post('/resources/:resourceId', (req, res) => {
+	res.json({ message: 'Resource created successfully' });
 });
 
 gameRouter.put(
 	'/resources/:resourceId/position',
-	isAuthenticated,
+
 	(req, res) => {
-		// Logic to update resource's position
-		// User have to be authenticated
+		return res.status(501).json({
+			error: 'Not implemented yet',
+		});
 	}
 );
 
-gameRouter.get('/zrr', isAuthenticated, (req, res) => {
-	// Logic to get ZRR
-	// User have to be authenticated
+// Update player position
+gameRouter.post('/player/position', (req, res) => {
+	const { position } = req.body;
+	if (!position || position.length !== 2) {
+		return res.status(400).json({ error: 'Invalid position data' });
+	}
+
+	const data = readData();
+	data.players = data.players || [];
+	const playerIndex = data.players.findIndex((p) => p.id === req.body.playerId);
+
+	if (playerIndex !== -1) {
+		data.players[playerIndex].position = position;
+	} else {
+		data.players.push({ id: req.body.playerId, position });
+	}
+
+	writeData(data);
+	res.json({ message: 'Position updated successfully' });
+});
+
+// Process a showcase (vitrine)
+gameRouter.post('/vitrine/:id/process', (req, res) => {
+	if (!req.params.id || !req.body.position) {
+		return res.status(400).json({ error: 'Invalid request data' });
+	}
+	const { id } = req.params;
+	const { position } = req.body;
+
+	const data = readData();
+	const vitrine = (data.vitrines || []).find((v) => v.id === id);
+
+	if (!vitrine) {
+		return res.status(404).json({ error: 'Vitrine not found' });
+	}
+
+	const distance = Math.sqrt(
+		Math.pow(vitrine.position[0] - position[0], 2) +
+			Math.pow(vitrine.position[1] - position[1], 2)
+	);
+
+	if (distance > 0.005) {
+		return res.status(400).json({ error: 'Too far from the vitrine' });
+	}
+
+	vitrine.TTL = Math.max(0, vitrine.TTL - 1);
+	if (vitrine.TTL === 0) {
+		data.vitrines = data.vitrines.filter((v) => v.id !== id);
+	}
+
+	writeData(data);
+	res.json({ message: 'Vitrine processed successfully', TTL: vitrine.TTL });
+});
+
+// Get ZRR limits
+gameRouter.get('/zrr', (req, res) => {
+	const data = readData();
+	if (!data.zrr) {
+		return res.status(404).json({ error: 'ZRR not defined' });
+	}
+	res.json(data.zrr);
 });
 
 export default gameRouter;

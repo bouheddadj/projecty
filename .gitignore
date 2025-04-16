@@ -228,3 +228,7 @@ dist
 
 config.json
 package-lock.json
+
+.env.production
+.env.development
+data.json

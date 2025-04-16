@@ -1,29 +1,47 @@
 import express from 'express';
+import fs from 'fs';
+import path from 'path';
 
 const adminRouter = express.Router();
+const dataFilePath = path.resolve('data.json');
 
-// Middleware to check if the user is authenticated and has admin role
-const isAuthenticatedAdmin = (req, res, next) => {
+const readData = () => {
 	try {
-		if (req.isAuthenticated() && req.user.species === 'admin') {
-			return next();
-		}
-		res.status(403).send('Forbidden');
-	} catch (error) {
-		res.status(500).send('Internal Server Error');
+		const data = fs.readFileSync(dataFilePath, 'utf-8');
+		return JSON.parse(data);
+	} catch {
+		return {};
 	}
+};
+
+const writeData = (data) => {
+	fs.writeFileSync(dataFilePath, JSON.stringify(data, null, 2), 'utf-8');
 };
 
 adminRouter.post('/admin/setZRR', (req, res) => {
 	const { point1, point2 } = req.body;
+	if (!point1 || !point2 || point1.length !== 2 || point2.length !== 2) {
+		return res.status(400).send('Invalid ZRR points');
+	}
+
+	const data = readData();
+	data.zrr = { point1, point2 };
+	writeData(data);
+
 	res.send('ZRR set successfully');
 });
 
-// Route to set the initial TTL
 adminRouter.post('/admin/setTTL', (req, res) => {
 	const { ttl } = req.body;
-	// Logic to set the TTL
-	res.send(`TTL set to ${ttl || 1} minute(s)`);
+	if (!ttl || typeof ttl !== 'number' || ttl <= 0) {
+		return res.status(400).send('Invalid TTL value');
+	}
+
+	const data = readData();
+	data.ttl = ttl;
+	writeData(data);
+
+	res.send(`TTL set to ${ttl} minute(s)`);
 });
 
 // Route to specify the species of a player
