@@ -1,58 +1,43 @@
 <template>
   <header>
     <h1>Panique au Musée</h1>
+
+    <nav>
+      <RouterLink to="/login">Login</RouterLink> |
+      <RouterLink to="/map">Carte</RouterLink>
+    </nav>
   </header>
 
   <main>
-    <!-- Si non connecté -->
-    <div v-if="!logged">
-      <HelloWorld msg="Bienvenue invité, connectez-vous" />
-      <Login
-        :message="loginErrorMessage"
-        @loginEvent="handleLogin"
-        @loginError="handleLoginError"
-      />
-    </div>
-
-    <!-- Si connecté -->
-    <div v-else>
-      <HelloWorld msg="Bienvenue, joueur authentifié" />
-      <button @click="logout">Se déconnecter</button>
-      <MyMap />
-    </div>
+    <RouterView />
   </main>
 </template>
 
 <script lang="ts">
-import HelloWorld from './components/HelloWorld.vue';
-import Login from './components/Login.vue';
-import MyMap from './components/MyMap.vue';
+import { RouterLink, RouterView } from 'vue-router';
 
 export default {
-  components: { HelloWorld, Login, MyMap },
-  data() {
-    return {
-      logged: false,
-      loginErrorMessage: '',
-    };
+  components: {
+    RouterLink,
+    RouterView,
   },
-  methods: {
-    handleLogin(token: string) {
-      console.log('Token reçu et stocké');
-      this.logged = true;
-      this.loginErrorMessage = '';
-      localStorage.setItem('token', token); // facultatif
-    },
-    handleLoginError(message: string) {
-      console.log('Erreur de login :', message);
-      this.loginErrorMessage = message;
-    },
-    logout() {
-      console.log('Déconnexion');
-      this.logged = false;
-      localStorage.removeItem('token');
-    }
-  }
 };
 </script>
+
+<style scoped>
+nav {
+  margin: 1em 0;
+}
+
+nav a {
+  text-decoration: none;
+  padding: 0.5em;
+  color: #333;
+}
+
+nav a.router-link-exact-active {
+  font-weight: bold;
+  color: #42b983;
+}
+</style>
 
