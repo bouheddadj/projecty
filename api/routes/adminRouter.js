@@ -1,62 +1,82 @@
 import express from 'express';
-import fs from 'fs';
-import path from 'path';
+import { readData, writeData } from '../utils/fileHandler.js';
 
 const adminRouter = express.Router();
-const dataFilePath = path.resolve('data.json');
 
-const readData = () => {
-	try {
-		const data = fs.readFileSync(dataFilePath, 'utf-8');
-		return JSON.parse(data);
-	} catch {
-		return {};
-	}
-};
-
-const writeData = (data) => {
-	fs.writeFileSync(dataFilePath, JSON.stringify(data, null, 2), 'utf-8');
-};
-
-adminRouter.post('/admin/setZRR', (req, res) => {
+adminRouter.post('/setZRR', async (req, res) => {
 	const { point1, point2 } = req.body;
 	if (!point1 || !point2 || point1.length !== 2 || point2.length !== 2) {
 		return res.status(400).send('Invalid ZRR points');
 	}
 
-	const data = readData();
-	data.zrr = { point1, point2 };
-	writeData(data);
+	const data = await readData();
+	data.zrr = {
+		no: point1,
+		se: point2
+	};
 
+	await writeData(data);
 	res.send('ZRR set successfully');
 });
 
-adminRouter.post('/admin/setTTL', (req, res) => {
+adminRouter.post('/setTTL', async (req, res) => {
 	const { ttl } = req.body;
 	if (!ttl || typeof ttl !== 'number' || ttl <= 0) {
 		return res.status(400).send('Invalid TTL value');
 	}
 
-	const data = readData();
+	const data = await readData();
 	data.ttl = ttl;
-	writeData(data);
+	await writeData(data);
 
 	res.send(`TTL set to ${ttl} minute(s)`);
 });
 
-// Route to specify the species of a player
-adminRouter.post('/admin/setSpecies', (req, res) => {
+adminRouter.post('/setSpecies', async (req, res) => {
 	const { playerId, species } = req.body;
-	if (species !== 'voleur' && species !== 'policier') {
-		return res.status(400).send('Invalid species');
+	if (!playerId || (species !== 'voleur' && species !== 'policier')) {
+		return res.status(400).send('Invalid species or playerId');
 	}
+
+	const data = await readData();
+	data.players = data.players || [];
+
+	const index = data.players.findIndex((p) => p.id === playerId);
+
+	if (index !== -1) {
+		data.players[index].species = species;
+	} else {
+		data.players.push({ id: playerId, species });
+	}
+
+	await writeData(data);
 	res.send(`Player ${playerId} set to species ${species}`);
 });
 
-// Route to trigger the appearance of a showcase
-adminRouter.post('/admin/triggerShowcase', (req, res) => {
-	// Logic to trigger the appearance of a showcase
-	res.send('Showcase triggered successfully');
+adminRouter.post('/triggerShowcase', async (req, res) => {
+	const { position } = req.body;
+	if (!position || !Array.isArray(position) || position.length !== 2) {
+		return res.status(400).send('Invalid position');
+	}
+
+	const data = await readData();
+	data.vitrines = data.vitrines || [];
+
+	const newId = `vitrine-${Date.now()}`;
+	const ttl = data.ttl || 60; // Par défaut 60 si non défini
+
+	const newVitrine = {
+		id: newId,
+		position,
+		TTL: ttl,
+		ouverte: true
+	};
+
+	data.vitrines.push(newVitrine);
+	await writeData(data);
+
+	res.send(`Showcase ${newId} created at position ${position}`);
 });
 
 export default adminRouter;
+
