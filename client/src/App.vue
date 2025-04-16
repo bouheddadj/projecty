@@ -1,53 +1,58 @@
-<script setup>
-import HelloWorld from "./components/HelloWorld.vue";
-import TheWelcome from "./components/TheWelcome.vue";
-</script>
-
 <template>
   <header>
-    <img
-      alt="Vue logo"
-      class="logo"
-      src="./assets/logo.svg"
-      width="125"
-      height="125"
-    />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-    </div>
+    <h1>Panique au Musée</h1>
   </header>
 
   <main>
-    <TheWelcome />
+    <!-- Si non connecté -->
+    <div v-if="!logged">
+      <HelloWorld msg="Bienvenue invité, connectez-vous" />
+      <Login
+        :message="loginErrorMessage"
+        @loginEvent="handleLogin"
+        @loginError="handleLoginError"
+      />
+    </div>
+
+    <!-- Si connecté -->
+    <div v-else>
+      <HelloWorld msg="Bienvenue, joueur authentifié" />
+      <button @click="logout">Se déconnecter</button>
+      <MyMap />
+    </div>
   </main>
 </template>
 
-<style scoped>
-header {
-  line-height: 1.5;
-}
+<script lang="ts">
+import HelloWorld from './components/HelloWorld.vue';
+import Login from './components/Login.vue';
+import MyMap from './components/MyMap.vue';
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
+export default {
+  components: { HelloWorld, Login, MyMap },
+  data() {
+    return {
+      logged: false,
+      loginErrorMessage: '',
+    };
+  },
+  methods: {
+    handleLogin(token: string) {
+      console.log('Token reçu et stocké');
+      this.logged = true;
+      this.loginErrorMessage = '';
+      localStorage.setItem('token', token); // facultatif
+    },
+    handleLoginError(message: string) {
+      console.log('Erreur de login :', message);
+      this.loginErrorMessage = message;
+    },
+    logout() {
+      console.log('Déconnexion');
+      this.logged = false;
+      localStorage.removeItem('token');
+    }
   }
+};
+</script>
 
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-}
-</style>
