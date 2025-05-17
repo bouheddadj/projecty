@@ -1,27 +1,20 @@
 import { readFile, writeFile } from 'fs/promises';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
+import path from 'path';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const dataPath = path.resolve('data/gameData.json');
 
-const filePath = join(__dirname, '../data/gameData.json');
-
+// Fonction pour lire le json (fichier qui stocke les données du jeux)
 export async function readData() {
 	try {
-		const content = await readFile(filePath, 'utf-8');
-		return JSON.parse(content);
-	} catch (err) {
-		console.error('Erreur lecture JSON :', err);
-		return null;
+		const raw = await readFile(dataPath, 'utf-8');
+		return JSON.parse(raw);
+	} catch (e) {
+		console.error('Erreur lecture JSON :', e);
+		return { players: [], vitrines: [], zrr: null, ttl: 60 }; // fallback safe
 	}
 }
 
 export async function writeData(data) {
-	try {
-		await writeFile(filePath, JSON.stringify(data, null, 2), 'utf-8');
-	} catch (err) {
-		console.error('Erreur écriture JSON :', err);
-	}
+	await writeFile(dataPath, JSON.stringify(data, null, 2), 'utf-8');
 }
 

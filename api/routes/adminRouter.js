@@ -1,81 +1,84 @@
 import express from 'express';
 import { readData, writeData } from '../utils/fileHandler.js';
+import { v4 as uuidv4 } from 'uuid';
 
 const adminRouter = express.Router();
 
 adminRouter.post('/setZRR', async (req, res) => {
 	const { point1, point2 } = req.body;
-	if (!point1 || !point2 || point1.length !== 2 || point2.length !== 2) {
-		return res.status(400).send('Invalid ZRR points');
+
+	if (!Array.isArray(point1) || !Array.isArray(point2)) {
+		return res.status(400).json({ error: 'Invalid ZRR format' });
 	}
 
 	const data = await readData();
-	data.zrr = {
-		no: point1,
-		se: point2
-	};
+	data.zrr = { point1, point2 };
 
 	await writeData(data);
-	res.send('ZRR set successfully');
+	res.json({ message: 'ZRR defined successfully' });
 });
+
 
 adminRouter.post('/setTTL', async (req, res) => {
 	const { ttl } = req.body;
+
 	if (!ttl || typeof ttl !== 'number' || ttl <= 0) {
-		return res.status(400).send('Invalid TTL value');
+		return res.status(400).json({ error: 'Invalid TTL value' });
 	}
 
 	const data = await readData();
 	data.ttl = ttl;
-	await writeData(data);
 
-	res.send(`TTL set to ${ttl} minute(s)`);
+	await writeData(data);
+	res.json({ message: `TTL set to ${ttl} seconds` });
 });
+
 
 adminRouter.post('/setSpecies', async (req, res) => {
 	const { playerId, species } = req.body;
-	if (!playerId || (species !== 'voleur' && species !== 'policier')) {
-		return res.status(400).send('Invalid species or playerId');
+
+	if (!playerId || !['VOLEUR', 'POLICIER'].includes(species)) {
+		return res.status(400).json({ error: 'Invalid playerId or species' });
 	}
 
 	const data = await readData();
 	data.players = data.players || [];
 
-	const index = data.players.findIndex((p) => p.id === playerId);
+	const player = data.players.find(p => p.id === playerId);
 
-	if (index !== -1) {
-		data.players[index].species = species;
+	if (player) {
+		player.species = species;
 	} else {
 		data.players.push({ id: playerId, species });
 	}
 
 	await writeData(data);
-	res.send(`Player ${playerId} set to species ${species}`);
+	res.json({ message: `Player ${playerId} set to species ${species}` });
 });
+
 
 adminRouter.post('/triggerShowcase', async (req, res) => {
 	const { position } = req.body;
-	if (!position || !Array.isArray(position) || position.length !== 2) {
-		return res.status(400).send('Invalid position');
+
+	if (!Array.isArray(position) || position.length !== 2) {
+		return res.status(400).json({ error: 'Invalid position format' });
 	}
 
 	const data = await readData();
 	data.vitrines = data.vitrines || [];
 
-	const newId = `vitrine-${Date.now()}`;
-	const ttl = data.ttl || 60; // Par défaut 60 si non défini
+	const ttl = data.ttl || 60;
 
-	const newVitrine = {
-		id: newId,
+	const newShowcase = {
+		id: uuidv4(),
 		position,
-		TTL: ttl,
-		ouverte: true
+		TTL: ttl
 	};
 
-	data.vitrines.push(newVitrine);
+	data.vitrines.push(newShowcase);
 	await writeData(data);
 
-	res.send(`Showcase ${newId} created at position ${position}`);
+	res.json({ message: 'Showcase triggered', showcase: newShowcase });
 });
 
 export default adminRouter;
