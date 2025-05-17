@@ -22,7 +22,7 @@ const config = {
     },
     plugins: [
         new HtmlWebpackPlugin({
-            template: 'admin.html',
+            template: 'index.html',
         }),
 
         // Add your plugins here

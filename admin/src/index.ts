@@ -1,6 +1,1 @@
-import map from './map';
-import form from './form';
-import './css/style.css';
-
-const mymap = map();
-const myform = form(mymap);
+console.log("Hello This is a Typescript project.");
