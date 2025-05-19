@@ -49,13 +49,30 @@ deploy_express:
     - ssh -o StrictHostKeyChecking=no -i $CI_SSH_KEY gitlabci@192.168.75.33 "cd /opt/express && pm2 stop server.js && npm install && pm2 restart server.js"
 
 # # Deploy API-GAME
-# deploy_game:
-#   stage: deploy
-#   only:
-#     - main
-#   script:
-#     - scp -r -o StrictHostKeyChecking=no -i $CI_SSH_KEY ./api/* gitlabci@192.168.75.33:/opt/api-game
-#     - ssh -o StrictHostKeyChecking=no -i $CI_SSH_KEY gitlabci@192.168.75.33 "cd /opt/api-game && pm2 stop server.js && npm install && pm2 restart server.js"
+deploy_game:
+  stage: deploy
+  only:
+    - main
+  before_script:
+    - apk add --no-cache openssh-client rsync
+    - chmod 400 $CI_SSH_KEY
+  script:
+    # Copier les fichiers Express vers la VM
+    - scp -r -o StrictHostKeyChecking=no -i $CI_SSH_KEY ./api/* gitlabci@192.168.75.33:/opt/api-game
+
+    # Transférer le contenu de la variable .env.production dans un fichier temporaire
+    - echo "$ENV_PRODUCTION_API_GAME" > temp.env
+
+    # Copier ce fichier .env.production dans /opt/api-game
+    - scp -o StrictHostKeyChecking=no -i $CI_SSH_KEY temp.env gitlabci@192.168.75.33:/opt/api-game/.env.production
+
+    # Lancer / relancer PM2 avec le bon env
+    - ssh -o StrictHostKeyChecking=no -i $CI_SSH_KEY gitlabci@192.168.75.33 "
+      cd /opt/api-game &&
+      pm2 stop server.js || true &&
+      npm install &&
+      pm2 start server.js --name api-game --env production
+      "
 
 # Deploy front-end
 deploy_front:
