@@ -1,3 +1,6 @@
+const webpack = require("webpack");
+const dotenv = require("dotenv");
+const fs = require("fs");
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
@@ -9,12 +12,24 @@ const stylesHandler = isProduction
   : "style-loader";
 
 module.exports = () => {
-  return {
+  // Charge le fichier .env à la racine du projet
+  const envFile = path.resolve(__dirname, ".env");
+
+  let envVars = {};
+  if (fs.existsSync(envFile)) {
+    const env = dotenv.parse(fs.readFileSync(envFile));
+    envVars = Object.keys(env).reduce((acc, key) => {
+      acc[`process.env.${key}`] = JSON.stringify(env[key]);
+      return acc;
+    }, {});
+  }
+
+  const config = {
     mode: isProduction ? "production" : "development",
     output: {
       path: path.resolve(__dirname, "dist"),
-      filename: "[name].bundle.js", // génère main.bundle.js
-      clean: true, // supprime dist/ à chaque build
+      filename: "[name].bundle.js",
+      clean: true,
     },
     devServer: {
       static: {
@@ -22,11 +37,11 @@ module.exports = () => {
       },
       open: true,
       host: "localhost",
-      port: 8080,
+      port: 8081,
     },
     entry: {
-      main: "./src/index.ts", // admin.html
-      login: "./src/login.ts", // index.html
+      main: "./src/index.ts", // pour admin.html
+      login: "./src/login.ts", // pour index.html
     },
     plugins: [
       new HtmlWebpackPlugin({
@@ -39,6 +54,7 @@ module.exports = () => {
         template: "./src/index.html",
         chunks: ["login"],
       }),
+      new webpack.DefinePlugin(envVars),
     ],
     module: {
       rules: [
@@ -65,4 +81,10 @@ module.exports = () => {
       extensions: [".ts", ".tsx", ".js"],
     },
   };
+
+  if (isProduction) {
+    config.plugins.push(new MiniCssExtractPlugin());
+  }
+
+  return config;
 };
