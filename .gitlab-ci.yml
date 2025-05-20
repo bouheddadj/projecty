@@ -60,9 +60,8 @@ deploy_api_game:
     - scp -r -o StrictHostKeyChecking=no -i $CI_SSH_KEY ./api/* gitlabci@192.168.75.33:/opt/api-game
 
     - echo "$ENV_PRODUCTION_API_GAME" > temp.env
-    - scp -o StrictHostKeyChecking=no -i $CI_SSH_KEY temp.env gitlabci@192.168.75.33:/opt/api-game/.env.production
 
-    - scp -o StrictHostKeyChecking=no -i $CI_SSH_KEY ./ecosystem.config.js gitlabci@192.168.75.33:/opt/api-game/
+    - scp -o StrictHostKeyChecking=no -i $CI_SSH_KEY temp.env gitlabci@192.168.75.33:/opt/api-game/.env.production
 
     - ssh -o StrictHostKeyChecking=no -i $CI_SSH_KEY gitlabci@192.168.75.33 "
       cd /opt/api-game &&
