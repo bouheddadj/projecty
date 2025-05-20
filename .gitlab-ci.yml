@@ -80,6 +80,7 @@ deploy_admin:
   only:
     - main
   before_script:
+    - apk add --no-cache openssh-client rsync
     - chmod 400 $CI_SSH_KEY
   image: node:23-slim
   script:
