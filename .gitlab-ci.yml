@@ -79,16 +79,17 @@ deploy_admin:
   stage: deploy
   only:
     - main
-  before_script:
-    - apk add --no-cache openssh-client rsync
-    - chmod 400 $CI_SSH_KEY
   image: node:23-slim
+  before_script:
+    - apt-get update && apt-get install -y openssh-client rsync
+    - chmod 400 $CI_SSH_KEY
   script:
     - cd admin
     - echo "$ENV_PRODUCTION_ADMIN" > .env.production
     - npm install
+    - npm install dotenv --save-dev
     - npm run build
-    - scp -o StrictHostKeyChecking=no -i $CI_SSH_KEY gitlabci@192.168.75.33:/usr/share/nginx/html/secret/
+    - scp -r -o StrictHostKeyChecking=no -i $CI_SSH_KEY dist/* gitlabci@192.168.75.33:/usr/share/nginx/html/secret/
 
 # Deploy front-end
 deploy_front:
