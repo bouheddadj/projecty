@@ -40,7 +40,7 @@ deploy_api:
     - scp -o StrictHostKeyChecking=no -i $CI_SSH_KEY users/target/users.war gitlabci@192.168.75.33:$API_DEPLOY_PATH
 
 # Deploy Express Server TEST
-deploy_express:
+deploy_test_express:
   stage: deploy
   only:
     - main
@@ -49,7 +49,7 @@ deploy_express:
     - ssh -o StrictHostKeyChecking=no -i $CI_SSH_KEY gitlabci@192.168.75.33 "cd /opt/express && pm2 stop server.js && npm install && pm2 restart server.js"
 
 # # Deploy API-GAME
-deploy_game:
+deploy_api_game:
   stage: deploy
   only:
     - main
@@ -73,6 +73,21 @@ deploy_game:
       npm install &&
       pm2 start server.js --name api-game --env production
       "
+
+# Deploy ADMIN-CLIENT
+deploy_api_game:
+  stage: deploy
+  only:
+    - main
+  before_script:
+    - apk add --no-cache openssh-client rsync
+    - chmod 400 $CI_SSH_KEY
+  script:
+    - cd admim 
+    - echo "$ENV_PRODUCTION_ADMIN" > .env.production 
+    - npm ci
+    - npm run build
+    - scp -o StrictHostKeyChecking=no -i $CI_SSH_KEY gitlabci@192.168.75.33:/usr/share/nginx/html/secret/ 
 
 # Deploy front-end
 deploy_front:
