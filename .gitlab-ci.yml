@@ -75,7 +75,7 @@ deploy_api_game:
       "
 
 # Deploy ADMIN-CLIENT
-deploy_api_game:
+deploy_admin:
   stage: deploy
   only:
     - main
@@ -83,11 +83,11 @@ deploy_api_game:
     - apk add --no-cache openssh-client rsync
     - chmod 400 $CI_SSH_KEY
   script:
-    - cd admim 
-    - echo "$ENV_PRODUCTION_ADMIN" > .env.production 
+    - cd admim
+    - echo "$ENV_PRODUCTION_ADMIN" > .env.production
     - npm ci
     - npm run build
-    - scp -o StrictHostKeyChecking=no -i $CI_SSH_KEY gitlabci@192.168.75.33:/usr/share/nginx/html/secret/ 
+    - scp -o StrictHostKeyChecking=no -i $CI_SSH_KEY gitlabci@192.168.75.33:/usr/share/nginx/html/secret/
 
 # Deploy front-end
 deploy_front:
