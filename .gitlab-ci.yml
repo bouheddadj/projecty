@@ -57,21 +57,19 @@ deploy_api_game:
     - apk add --no-cache openssh-client rsync
     - chmod 400 $CI_SSH_KEY
   script:
-    # Copier les fichiers Express vers la VM
     - scp -r -o StrictHostKeyChecking=no -i $CI_SSH_KEY ./api/* gitlabci@192.168.75.33:/opt/api-game
 
-    # Transférer le contenu de la variable .env.production dans un fichier temporaire
     - echo "$ENV_PRODUCTION_API_GAME" > temp.env
-
-    # Copier ce fichier .env.production dans /opt/api-game
     - scp -o StrictHostKeyChecking=no -i $CI_SSH_KEY temp.env gitlabci@192.168.75.33:/opt/api-game/.env.production
 
-    # Lancer / relancer PM2 avec le bon env
+    - scp -o StrictHostKeyChecking=no -i $CI_SSH_KEY ./ecosystem.config.js gitlabci@192.168.75.33:/opt/api-game/
+
     - ssh -o StrictHostKeyChecking=no -i $CI_SSH_KEY gitlabci@192.168.75.33 "
       cd /opt/api-game &&
-      pm2 stop server.js || true &&
+      pm2 delete api-game || true &&
       npm install &&
-      pm2 start server.js --name api-game --env production
+      pm2 start ecosystem.config.js --env production &&
+      pm2 save
       "
 
 # Deploy ADMIN-CLIENT
