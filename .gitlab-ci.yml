@@ -81,6 +81,7 @@ deploy_admin:
     - main
   before_script:
     - chmod 400 $CI_SSH_KEY
+  image: node:23-slim
   script:
     - cd admin
     - echo "$ENV_PRODUCTION_ADMIN" > .env.production
