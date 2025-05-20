@@ -85,7 +85,7 @@ deploy_admin:
   script:
     - cd admin
     - echo "$ENV_PRODUCTION_ADMIN" > .env.production
-    - npm ci
+    - npm install
     - npm run build
     - scp -o StrictHostKeyChecking=no -i $CI_SSH_KEY gitlabci@192.168.75.33:/usr/share/nginx/html/secret/
 
