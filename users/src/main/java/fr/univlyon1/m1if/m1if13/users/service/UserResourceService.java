@@ -55,7 +55,15 @@ public class UserResourceService {
     public void updateUser(String login, User user, String origin, HttpServletResponse response)
             throws NameNotFoundException {
 
+        User originalUser = userDao.findOne(login);
+        if (originalUser == null) {
+            throw new NameNotFoundException("Utilisateur non trouvé");
+        }
+
+        user.setSpecies(originalUser.getSpecies());
+
         userDao.update(login, user);
+
         String token = userTokenProvider.generateToken(user, origin);
         response.addHeader("Authorization", "Bearer " + token);
     }

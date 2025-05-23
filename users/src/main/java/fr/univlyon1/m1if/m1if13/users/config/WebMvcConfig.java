@@ -12,42 +12,32 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @EnableWebMvc
 public class WebMvcConfig implements WebMvcConfigurer {
 
-        @Override
-        public void addCorsMappings(CorsRegistry registry) {
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
 
-                String[] origins = {
-                                "http://localhost",
-                                "http://127.0.0.1:5500", // temporaire pour les tests en local
-                                "http://localhost:8081",
-                                "https://192.168.75.33",
-                                "http://192.168.75.33:8443",
-                                "https://192.168.75.33:8443",
-                };
+        String[] staticOrigins = {
+                "https://192.168.75.33",
+                "http://192.168.75.33:8443",
+                "https://192.168.75.33:8443"
+        };
 
-                registry
-                                .addMapping("/users/{login}")
-                                .allowedOrigins(origins)
-                                .allowCredentials(true)
-                                .maxAge(3600)
-                                .allowedMethods("GET")
-                                .allowedHeaders("Authorization", "Content-Type")
-                                .exposedHeaders("Authorization",
-                                                "Content-Type", "Location", "Link");
-                registry
-                                .addMapping("/login")
-                                .allowedOrigins(origins)
-                                .allowedMethods("POST")
-                                .allowedHeaders("Authorization", "Content-Type")
-                                .exposedHeaders("Authorization",
-                                                "Content-Type", "Location", "Link")
-                                .maxAge(3600);
-                registry
-                                .addMapping("/logout")
-                                .allowedOrigins(origins)
-                                .allowedMethods("POST")
-                                .allowedHeaders("Authorization", "Content-Type")
-                                .exposedHeaders("Authorization",
-                                                "Content-Type", "Location", "Link")
-                                .maxAge(3600);
-        }
+        String[] wildcardOrigins = {
+                "http://localhost:*",
+                "http://127.0.0.1:*"
+        };
+
+        registry.addMapping("/**")
+                .allowedOriginPatterns(merge(staticOrigins, wildcardOrigins))
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                .allowedHeaders("*")
+                .exposedHeaders("Authorization", "Content-Type", "Location", "Link")
+                .allowCredentials(true)
+                .maxAge(3600);
+    }
+
+    private String[] merge(String[]... arrays) {
+        return java.util.Arrays.stream(arrays)
+                .flatMap(java.util.Arrays::stream)
+                .toArray(String[]::new);
+    }
 }

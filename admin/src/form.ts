@@ -92,16 +92,16 @@ function setZrr(mymap: L.Map): void {
 // Requêtes asynchrones
 function sendZrr(): void {
   const lat1 = parseFloat(
-    (document.getElementById("lat1") as HTMLInputElement).value,
+    (document.getElementById("lat1") as HTMLInputElement).value
   );
   const lon1 = parseFloat(
-    (document.getElementById("lon1") as HTMLInputElement).value,
+    (document.getElementById("lon1") as HTMLInputElement).value
   );
   const lat2 = parseFloat(
-    (document.getElementById("lat2") as HTMLInputElement).value,
+    (document.getElementById("lat2") as HTMLInputElement).value
   );
   const lon2 = parseFloat(
-    (document.getElementById("lon2") as HTMLInputElement).value,
+    (document.getElementById("lon2") as HTMLInputElement).value
   );
 
   if ([lat1, lon1, lat2, lon2].some(isNaN)) {
@@ -168,6 +168,41 @@ function setTtl(): void {
       alert("Erreur lors de l'envoi du TTL : " + err.message);
     });
 }
+document
+  .getElementById("generateShowcaseButton")
+  ?.addEventListener("click", () => {
+    const input = document.getElementById("vitrineCount") as HTMLInputElement;
+    const count = parseInt(input.value);
+
+    if (isNaN(count) || count <= 0) {
+      alert("Nombre invalide.");
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+    const baseUrlApi = process.env.BASE_URL_API;
+
+    fetch(`${baseUrlApi}/admin/randomShowcase`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token || "",
+      },
+      body: JSON.stringify({ count }),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Erreur lors de l'ajout de vitrines");
+        return res.json();
+      })
+      .then((data) => {
+        alert(`${data.vitrines.length} vitrine(s) ajoutée(s) avec succès`);
+        console.log(data.vitrines);
+      })
+      .catch((err) => {
+        console.error(err);
+        alert("Erreur lors de la génération : " + err.message);
+      });
+  });
 
 export { updateLatValue, updateLonValue, updateZoomValue, updateMap };
 

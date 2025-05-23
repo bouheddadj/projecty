@@ -1,84 +1,228 @@
 <template>
-  <section>
-    <h2>Carte</h2>
-    <p class="content">
-      <strong>TODO :</strong> mettre à jour les positions des différents objets
-      sur la carte.
-    </p>
-    <div id="map" class="map" ref="map"></div>
-  </section>
+  <div class="map-page">
+    <div class="map-card">
+      <h1>🎮 Carte du Jeu</h1>
+      <p class="intro">Surveille ton environnement et agis rapidement !</p>
+
+      <div id="map" class="map" ref="map"></div>
+      <button @click="goToProfile" class="profile-button">
+        Modifier mon profil
+      </button>
+      <button @click="logout">Quitter le jeu</button>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
+import { onMounted } from "vue";
+import { useRouter } from "vue-router";
+import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-//import { LMap, LTileLayer } from "@vue-leaflet/vue-leaflet";
-
-// initialisation de la map
-let lat = 45.782,
-  lng = 4.8656;
-const zoom = 19;
-let mymap = {};
+import "leaflet.awesome-markers/dist/leaflet.awesome-markers.css";
+// @ts-ignore
+import "leaflet.awesome-markers";
 
 export default {
   name: "MyMap",
-  methods: {
-    // Procédure de mise à jour de la map
-    updateMap: function () {
-      // Affichage à la nouvelle position
-      mymap.setView([lat, lng], zoom);
+  setup() {
+    const router = useRouter();
+    // @ts-ignore
+    const API_URL_GAME = import.meta.env.VITE_API_URL_GAME;
+    // @ts-ignore
+    const API_URL_USERS = import.meta.env.VITE_API_URL_USERS;
 
-      // La fonction de validation du formulaire renvoie false pour bloquer le rechargement de la page.
-      return false;
-    },
-  },
-  async beforeMount() {
-    // HERE is where to load Leaflet components!
-    const L = await import("leaflet");
-    // Procédure d'initialisation
-    mymap = L.map("map", {
-      center: [lat, lng],
-      zoom: zoom,
-    });
-    //updateMap();
+    const goToProfile = () => {
+      router.push({ name: "Profile" });
+    };
 
-    // Création d'un "tile layer" (permet l'affichage sur la carte)
-    L.tileLayer(
-      "https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}@2x.jpg90?access_token=pk.eyJ1IjoieGFkZXMxMDExNCIsImEiOiJjbGZoZTFvbTYwM29sM3ByMGo3Z3Mya3dhIn0.df9VnZ0zo7sdcqGNbfrAzQ",
-      {
-        maxZoom: 22,
-        minZoom: 1,
+    const logout = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) return router.push({ name: "Login" });
+
+      try {
+        await fetch(`${API_URL_GAME}/game/leave`, {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        await fetch(`${API_URL_USERS}/logout`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        localStorage.removeItem("token");
+        router.push({ name: "Login" });
+      } catch (err) {
+        console.error("Erreur de déconnexion :", err);
+      }
+    };
+
+    // @ts-ignore
+    const drawZRR = async (map: L.Map) => {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      try {
+        const res = await fetch(`${API_URL_GAME}/game/zrr`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!res.ok) return;
+        const [point1, point2] = await res.json();
+        L.rectangle([point1, point2], {
+          color: "orange",
+          weight: 2,
+          dashArray: "4",
+        })
+          .addTo(map)
+          .bindPopup("ZRR (Zone réglementée)");
+      } catch (err) {
+        console.error("ZRR error :", err);
+      }
+    };
+
+    // @ts-ignore
+    const loadResources = async (map: L.Map) => {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      try {
+        const res = await fetch(`${API_URL_GAME}/game/resources`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const resources = await res.json();
+        resources.forEach((res: any) => {
+          const pos = res.position;
+          if (!pos) return;
+
+          const icon = getIcon(res);
+          L.marker(pos, { icon })
+            .addTo(map)
+            .bindPopup(res.species || res.id);
+        });
+      } catch (err) {
+        console.error("Ressources error :", err);
+      }
+    };
+
+    const getIcon = (res: any) => {
+      const AwesomeMarkers = (window as any).L.AwesomeMarkers;
+      let icon = "question";
+      let color = "cadetblue";
+
+      if (res.species === "POLICIER") {
+        icon = "shield";
+        color = "blue";
+      } else if (res.species === "VOLEUR") {
+        icon = "user-secret";
+        color = "red";
+      } else if (res.TTL) {
+        icon = "archive";
+        color = "green";
+      }
+
+      return AwesomeMarkers.icon({
+        icon,
+        prefix: "fa",
+        markerColor: color,
+        extraClasses: "fa-2x",
+      });
+    };
+
+    onMounted(() => {
+      const token = localStorage.getItem("token");
+      if (!token) return router.push({ name: "Login" });
+
+      const map = L.map("map", {
+        center: [45.782, 4.8656],
+        zoom: 19,
+      });
+
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution:
-          'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
-          '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-          'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-        id: "mapbox/streets-v11",
-        tileSize: 512,
-        zoomOffset: -1,
-        accessToken:
-          "pk.eyJ1IjoieGFkZXMxMDExNCIsImEiOiJjbGZoZTFvbTYwM29sM3ByMGo3Z3Mya3dhIn0.df9VnZ0zo7sdcqGNbfrAzQ",
-      },
-    ).addTo(mymap);
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>',
+      }).addTo(map);
 
-    // Ajout d'un marker
-    L.marker([45.78207, 4.86559])
-      .addTo(mymap)
-      .bindPopup("Entrée du bâtiment<br><strong>Nautibus</strong>.")
-      .openPopup();
-
-    // Clic sur la carte
-    mymap.on("click", (e) => {
-      lat = e.latlng.lat;
-      lng = e.latlng.lng;
-      this.updateMap();
+      drawZRR(map);
+      loadResources(map);
     });
+
+    return { logout, goToProfile };
   },
 };
 </script>
 
 <style scoped>
-.map {
-  height: 400px;
+.map-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 90vh;
+  background: #f3f4f6;
+  padding: 2rem;
+}
+
+.map-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   width: 100%;
-  border: 1px solid;
+  max-width: 420px;
+  text-align: center;
+}
+
+.map-card h1 {
+  margin-bottom: 0.5rem;
+  font-size: 1.6rem;
+  color: #333;
+}
+
+.intro {
+  margin-bottom: 1.2rem;
+  color: #555;
+  font-size: 0.95rem;
+}
+
+.map {
+  height: 360px;
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  margin-bottom: 1rem;
+  overflow: hidden;
+}
+
+button {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #d9534f;
+  color: white;
+  font-size: 1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+button:hover {
+  background-color: #c9302c;
+}
+
+.profile-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  font-size: 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-bottom: 1rem;
+}
+
+.profile-button:hover {
+  background-color: #0056b3;
 }
 </style>

@@ -5,7 +5,8 @@ import fr.univlyon1.m1if.m1if13.users.model.User;
 
 /**
  * DTO renvoyé pour la représentation d'un utilisateur.
- * @param login Le login de l'utilisateur
+ * 
+ * @param login   Le login de l'utilisateur
  * @param species L'espèce de l'utilisateur
  */
 public record UserResponseDto(String login, Species species) {
