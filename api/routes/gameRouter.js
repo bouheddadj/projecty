@@ -139,7 +139,6 @@ gameRouter.post("/resources/:resourceId", async (req, res) => {
 
   const data = await readData();
 
-  // Récupération des deux entités concernées
   const source = data.players.find((p) => p.id === userId);
   const target =
     data.players.find((p) => p.id === resourceId) ||
@@ -149,14 +148,18 @@ gameRouter.post("/resources/:resourceId", async (req, res) => {
     return res.status(404).json({ error: "Resource or player not found" });
   }
 
-  // Calcul distance
-  const distance = Math.sqrt(
-    Math.pow(source.position[0] - target.position[0], 2) +
-      Math.pow(source.position[1] - target.position[1], 2)
-  );
+  const DEGREE_TO_METER = 111139;
 
-  if (distance > 0.005) {
-    return res.status(403).json({ error: "Too far from target" });
+  const distanceMeters =
+    Math.sqrt(
+      Math.pow(source.position[0] - target.position[0], 2) +
+        Math.pow(source.position[1] - target.position[1], 2)
+    ) * DEGREE_TO_METER;
+
+  if (distanceMeters > 5) {
+    return res
+      .status(403)
+      .json({ error: "Trop loin de la cible (5 mètres max)" });
   }
 
   switch (operationType) {
