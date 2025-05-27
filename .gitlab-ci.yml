@@ -59,7 +59,6 @@ deploy_test_express:
   only:
     - main
   script:
-    - cd express
     - scp -r $SSH_OPTIONS express/* $DEPLOY_USER@$DEPLOY_HOST:/opt/express
     - ssh $SSH_OPTIONS $DEPLOY_USER@$DEPLOY_HOST "
       cd /opt/express &&
