@@ -40,7 +40,7 @@ build_deploy_client:
     - chmod 400 $CI_SSH_KEY
   script:
     - cd client
-    - npm install
+    - npm ci
     - npm run build
     - scp -r $SSH_OPTIONS dist/* $DEPLOY_USER@$DEPLOY_HOST:/usr/share/nginx/html/client
 
@@ -62,7 +62,7 @@ deploy_test_express:
     - ssh $SSH_OPTIONS $DEPLOY_USER@$DEPLOY_HOST "
       cd /opt/express &&
       pm2 stop server.js || true &&
-      npm install &&
+      npm ci &&
       pm2 restart server.js
       "
 
@@ -79,7 +79,7 @@ deploy_api_game:
     - scp $SSH_OPTIONS temp.env $DEPLOY_USER@$DEPLOY_HOST:/opt/api-game/.env.production
     - ssh $SSH_OPTIONS $DEPLOY_USER@$DEPLOY_HOST "
       cd /opt/api-game &&
-      npm install &&
+      npm ci &&
       pm2 start ecosystem.config.cjs
       "
 
@@ -94,7 +94,7 @@ deploy_admin:
   script:
     - cd admin
     - echo \"$ENV_PRODUCTION_ADMIN\" > .env.production
-    - npm install
+    - npm ci
     - npm run build
     - scp -r $SSH_OPTIONS dist/* $DEPLOY_USER@$DEPLOY_HOST:/usr/share/nginx/html/secret/
 
