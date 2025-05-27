@@ -76,10 +76,10 @@ deploy_api_game:
     - chmod 400 $CI_SSH_KEY
   script:
     - cd api
-    - npm ci
     - scp -r $SSH_OPTIONS api/* $DEPLOY_USER@$DEPLOY_HOST:/opt/api-game
     - ssh $SSH_OPTIONS $DEPLOY_USER@$DEPLOY_HOST "
       cd /opt/api-game &&
+      npm ci &&
       pm2 start ecosystem.config.cjs --env production
       "
 
