@@ -18,18 +18,16 @@ before_script:
   - apk add --no-cache openssh-client rsync
 
 # Build API-USERS
-build_api:
+build_api_users:
   stage: build
   only:
-    - main # Limiter ce job à la branche main
+    - main
   script:
-    # Se placer dans le répertoire tp6 (API)
     - cd ./users
-    # Compiler et packager l'API
     - mvn clean package
   artifacts:
     paths:
-      - users/target/users.war # Conserver le fichier WAR pour l'étape de déploiement
+      - users/target/users.war
 
 # Build CLIENT
 build&deploy_client:
@@ -44,7 +42,7 @@ build&deploy_client:
     - cd client
     - npm install
     - npm run build
-    - scp -r -o StrictHostKeyChecking=no -i $CI_SSH_KEY ./client/dist/* gitlabci@192.168.75.33:/usr/share/nginx/html/client
+    - scp -r -o StrictHostKeyChecking=no -i $CI_SSH_KEY ./dist/* gitlabci@192.168.75.33:/usr/share/nginx/html/client
 
 # Deploy API-USERS
 deploy_api_users:
