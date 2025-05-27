@@ -60,10 +60,10 @@ deploy_test_express:
     - main
   script:
     - cd express
-    - npm ci
     - scp -r $SSH_OPTIONS express/* $DEPLOY_USER@$DEPLOY_HOST:/opt/express
     - ssh $SSH_OPTIONS $DEPLOY_USER@$DEPLOY_HOST "
       cd /opt/express &&
+      npm ci &&
       pm2 start server.js --name express-server
       "
 
@@ -75,7 +75,6 @@ deploy_api_game:
     - apk add --no-cache openssh-client rsync
     - chmod 400 $CI_SSH_KEY
   script:
-    - cd api
     - scp -r $SSH_OPTIONS api/* $DEPLOY_USER@$DEPLOY_HOST:/opt/api-game
     - ssh $SSH_OPTIONS $DEPLOY_USER@$DEPLOY_HOST "
       cd /opt/api-game &&
