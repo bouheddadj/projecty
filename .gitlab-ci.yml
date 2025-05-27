@@ -63,7 +63,7 @@ deploy_test_express:
     - ssh $SSH_OPTIONS $DEPLOY_USER@$DEPLOY_HOST "
       cd /opt/express &&
       npm ci &&
-      pm2 start server.js --name express-server
+      pm2 restart server.js --name express-server
       "
 
 deploy_api_game:
