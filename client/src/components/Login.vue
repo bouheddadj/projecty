@@ -47,7 +47,9 @@ export default defineComponent({
     const message = ref('');
     const router = useRouter();
 
+    @ts-ignore
     const API_URL_USERS = import.meta.env.VITE_API_URL_USERS;
+    @ts-ignore
     const API_URL_GAME = import.meta.env.VITE_API_URL_GAME;
 
     // 🔍 Fonction pour décoder un JWT

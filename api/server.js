@@ -40,6 +40,7 @@ const isAuthenticated = async (req, res, next) => {
     const url = `${BASE_URL_USERS}/authenticate?jwt=${token}&origin=${encodeURIComponent(
       origin
     )}`;
+    console.log(url);
     const response = await fetch(url, { method: "GET" });
 
     if (!response.ok) {
@@ -95,17 +96,15 @@ export function createServer() {
   return app;
 }
 
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  const app = createServer();
-  const PORT = process.env.PORT || 3000;
+const app = createServer();
+const PORT = process.env.PORT || 3000;
 
-  app.listen(PORT, () => {
-    console.log(`Serveur démarré sur http://localhost:${PORT}`);
-    console.log(
-      process.env.NODE_ENV === "production"
-        ? "Environnement de production"
-        : "Environnement de développement"
-    );
-    console.log(`🔗 BASE_URL_USERS = ${BASE_URL_USERS}`);
-  });
-}
+app.listen(PORT, () => {
+  console.log(`Serveur démarré sur http://localhost:${PORT}`);
+  console.log(
+    process.env.NODE_ENV === "production"
+      ? "Environnement de production"
+      : "Environnement de développement"
+  );
+  console.log(`🔗 BASE_URL_USERS = ${BASE_URL_USERS}`);
+});
