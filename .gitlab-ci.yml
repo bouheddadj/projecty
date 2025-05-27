@@ -30,7 +30,7 @@ build_api_users:
       - users/target/users.war
 
 # Build CLIENT
-build&deploy_client:
+build_deploy_client:
   stage: build
   only:
     - main
@@ -82,10 +82,8 @@ deploy_api_game:
 
     - ssh -o StrictHostKeyChecking=no -i $CI_SSH_KEY gitlabci@192.168.75.33 "
       cd /opt/api-game &&
-      pm2 delete api-game || true &&
       npm install &&
-      pm2 start ecosystem.config.js --env production &&
-      pm2 save
+      pm2 start ecosystem.config.cjs
       "
 
 # Deploy ADMIN-CLIENT
