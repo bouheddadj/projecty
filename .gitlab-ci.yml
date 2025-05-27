@@ -31,6 +31,28 @@ build_api:
     paths:
       - users/target/users.war # Conserver le fichier WAR pour l'étape de déploiement
 
+# Build CLIENT
+build_client:
+  stage: build
+  only:
+    - main
+  image: node:23-slim
+  before_script:
+    - apt-get update && apt-get install -y openssh-client rsync
+    - chmod 400 $CI_SSH_KEY
+  script:
+    - cd client
+    - npm install
+    - npm run build
+
+# Deploy CLIENT
+deploy_client:
+  stage: deploy
+  only:
+    - main
+  script:
+    - scp -r -o StrictHostKeyChecking=no -i $CI_SSH_KEY ./client/dist/* gitlabci@192.168.75.33:/usr/share/nginx/html/client
+
 # Deploy API-USERS
 deploy_api_users:
   stage: deploy
@@ -46,7 +68,11 @@ deploy_test_express:
     - main
   script:
     - scp -r -o StrictHostKeyChecking=no -i $CI_SSH_KEY ./express/* gitlabci@192.168.75.33:/opt/express
-    - ssh -o StrictHostKeyChecking=no -i $CI_SSH_KEY gitlabci@192.168.75.33 "cd /opt/express && pm2 stop server.js && npm install && pm2 restart server.js"
+    - ssh -o StrictHostKeyChecking=no -i $CI_SSH_KEY gitlabci@192.168.75.33 "
+      cd /opt/express
+      && pm2 stop server.js || true
+      && npm install
+      && pm2 restart server.js"
 
 # # Deploy API-GAME
 deploy_api_game:
@@ -94,4 +120,4 @@ deploy_front:
   only:
     - main
   script:
-    - scp -r -o StrictHostKeyChecking=no -i $CI_SSH_KEY ./front/index.html gitlabci@192.168.75.33:/usr/share/nginx/html
+    - scp -r -o StrictHostKeyChecking=no -i $CI_SSH_KEY ./client/index.html gitlabci@192.168.75.33:/usr/share/nginx/html
