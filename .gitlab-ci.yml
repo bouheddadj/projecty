@@ -32,7 +32,7 @@ build_api:
       - users/target/users.war # Conserver le fichier WAR pour l'étape de déploiement
 
 # Build CLIENT
-build_client:
+build&deploy_client:
   stage: build
   only:
     - main
@@ -44,13 +44,6 @@ build_client:
     - cd client
     - npm install
     - npm run build
-
-# Deploy CLIENT
-deploy_client:
-  stage: deploy
-  only:
-    - main
-  script:
     - scp -r -o StrictHostKeyChecking=no -i $CI_SSH_KEY ./client/dist/* gitlabci@192.168.75.33:/usr/share/nginx/html/client
 
 # Deploy API-USERS
