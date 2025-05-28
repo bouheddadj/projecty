@@ -32,30 +32,28 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { defineComponent, ref } from "vue";
+import { useRouter } from "vue-router";
 
 export default defineComponent({
-  name: 'LoginPage',
+  name: "LoginPage",
   props: {
     message: String,
   },
-  emits: ['loginEvent', 'loginError'],
+  emits: ["loginEvent", "loginError"],
   setup(props, { emit }) {
-    const username = ref('');
-    const password = ref('');
-    const message = ref('');
+    const username = ref("");
+    const password = ref("");
+    const message = ref("");
     const router = useRouter();
 
-    @ts-ignore
     const API_URL_USERS = import.meta.env.VITE_API_URL_USERS;
-    @ts-ignore
     const API_URL_GAME = import.meta.env.VITE_API_URL_GAME;
 
     // 🔍 Fonction pour décoder un JWT
     const decodeJWT = (token: string): any => {
       try {
-        const base64 = token.split('.')[1];
+        const base64 = token.split(".")[1];
         const json = atob(base64);
         return JSON.parse(json);
       } catch (e) {
@@ -66,8 +64,8 @@ export default defineComponent({
     const login = async () => {
       try {
         const response = await fetch(`${API_URL_USERS}/login`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             login: username.value,
             password: password.value,
@@ -75,37 +73,37 @@ export default defineComponent({
         });
 
         if (!response.ok) {
-          throw new Error('Identifiants incorrects');
+          throw new Error("Identifiants incorrects");
         }
 
-        const tokenHeader = response.headers.get('Authorization');
+        const tokenHeader = response.headers.get("Authorization");
         if (!tokenHeader) {
-          throw new Error('Token manquant dans les headers');
+          throw new Error("Token manquant dans les headers");
         }
 
-        const token = tokenHeader.replace('Bearer ', '');
-        localStorage.setItem('token', token);
+        const token = tokenHeader.replace("Bearer ", "");
+        localStorage.setItem("token", token);
 
         const payload = decodeJWT(token);
         if (!payload || !payload.species) {
-          throw new Error('Token invalide ou incomplet');
+          throw new Error("Token invalide ou incomplet");
         }
 
         // 🧠 Ajouter le joueur au jeu s’il n’est pas ADMIN
-        if (payload.species !== 'ADMIN') {
+        if (payload.species !== "ADMIN") {
           await fetch(`${API_URL_GAME}/game/join`, {
-            method: 'POST',
+            method: "POST",
             headers: {
               Authorization: `Bearer ${token}`,
             },
           });
         }
 
-        emit('loginEvent', token);
-        router.push({ name: 'Map' });
+        emit("loginEvent", token);
+        router.push({ name: "Map" });
       } catch (err: any) {
-        const errorMessage = err.message || 'Erreur de connexion';
-        emit('loginError', errorMessage);
+        const errorMessage = err.message || "Erreur de connexion";
+        emit("loginError", errorMessage);
         message.value = errorMessage;
       }
     };

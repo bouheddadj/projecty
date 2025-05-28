@@ -28,7 +28,8 @@ const isAuthenticated = async (req, res, next) => {
 
   // Sinon, le comportement réel
   const authHeader = req.headers["authorization"];
-  const origin = req.headers["origin"] || "http://localhost";
+  const origin = req.headers["origin"] || "http://localhost:";
+  console.log(`Origin: ${origin}`);
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return res.status(401).json({ error: "Unauthorized" });
