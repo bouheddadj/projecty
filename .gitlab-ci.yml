@@ -62,6 +62,7 @@ deploy_test_express:
     - scp -r $SSH_OPTIONS express/* $DEPLOY_USER@$DEPLOY_HOST:/opt/express
     - ssh $SSH_OPTIONS $DEPLOY_USER@$DEPLOY_HOST "
       cd /opt/express &&
+      rm -rf node_modules &&
       npm ci &&
       pm2 restart server.js --name express-server
       "
@@ -77,6 +78,7 @@ deploy_api_game:
     - scp -r $SSH_OPTIONS api/* $DEPLOY_USER@$DEPLOY_HOST:/opt/api-game
     - ssh $SSH_OPTIONS $DEPLOY_USER@$DEPLOY_HOST "
       cd /opt/api-game &&
+      rm -rf node_modules &&
       npm ci &&
       pm2 start ecosystem.config.cjs --env production
       "
