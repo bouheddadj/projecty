@@ -204,6 +204,72 @@ document
       });
   });
 
+document
+  .getElementById("deleteShowcaseButton")
+  ?.addEventListener("click", () => {
+    const confirmation = confirm(
+      "Es-tu sûr de vouloir supprimer toutes les vitrines ?"
+    );
+    if (!confirmation) return;
+
+    const token = localStorage.getItem("token");
+    const baseUrlApi = process.env.BASE_URL_API;
+
+    fetch(`${baseUrlApi}/admin/showcases`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token || "",
+      },
+    })
+      .then((res) => {
+        if (!res.ok)
+          throw new Error("Erreur lors de la suppression des vitrines");
+        return res.json();
+      })
+      .then((data) => {
+        alert("Toutes les vitrines ont été supprimées avec succès !");
+        console.log(data);
+      })
+      .catch((err) => {
+        console.error(err);
+        alert("Erreur lors de la suppression : " + err.message);
+      });
+  });
+
+document
+  .getElementById("deletePlayersButton")
+  ?.addEventListener("click", () => {
+    const confirmation = confirm(
+      "Es-tu sûr de vouloir supprimer tous les joueurs ?"
+    );
+    if (!confirmation) return;
+
+    const token = localStorage.getItem("token");
+    const baseUrlApi = process.env.BASE_URL_API;
+
+    fetch(`${baseUrlApi}/admin/players`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token || "",
+      },
+    })
+      .then((res) => {
+        if (!res.ok)
+          throw new Error("Erreur lors de la suppression des joueurs");
+        return res.json();
+      })
+      .then((data) => {
+        alert("Tous les joueurs ont été supprimés avec succès !");
+        console.log(data);
+      })
+      .catch((err) => {
+        console.error(err);
+        alert("Erreur lors de la suppression : " + err.message);
+      });
+  });
+
 export { updateLatValue, updateLonValue, updateZoomValue, updateMap };
 
 export default initListeners;

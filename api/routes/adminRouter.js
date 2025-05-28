@@ -147,4 +147,44 @@ adminRouter.post("/randomShowcase", async (req, res) => {
   });
 });
 
+adminRouter.delete("/showcases", async (req, res) => {
+  try {
+    const data = await readData();
+
+    const deletedCount = data.vitrines?.length || 0;
+
+    data.vitrines = [];
+
+    await writeData(data);
+
+    res.status(200).json({
+      message: "Toutes les vitrines ont été supprimées.",
+      deletedCount,
+    });
+  } catch (err) {
+    console.error("Erreur lors de la suppression des vitrines :", err);
+    res.status(500).json({ error: "Erreur interne du serveur" });
+  }
+});
+
+adminRouter.delete("/players", async (req, res) => {
+  try {
+    const data = await readData();
+
+    const deletedCount = data.players?.length || 0;
+
+    data.players = [];
+
+    await writeData(data);
+
+    res.status(200).json({
+      message: "Tous les joueurs ont été supprimés.",
+      deletedCount,
+    });
+  } catch (err) {
+    console.error("Erreur lors de la suppression des joueurs :", err);
+    res.status(500).json({ error: "Erreur interne du serveur" });
+  }
+});
+
 export default adminRouter;

@@ -50,7 +50,6 @@ export default defineComponent({
     const API_URL_USERS = import.meta.env.VITE_API_URL_USERS;
     const API_URL_GAME = import.meta.env.VITE_API_URL_GAME;
 
-    // 🔍 Fonction pour décoder un JWT
     const decodeJWT = (token: string): any => {
       try {
         const base64 = token.split(".")[1];
@@ -89,7 +88,6 @@ export default defineComponent({
           throw new Error("Token invalide ou incomplet");
         }
 
-        // 🧠 Ajouter le joueur au jeu s’il n’est pas ADMIN
         if (payload.species !== "ADMIN") {
           await fetch(`${API_URL_GAME}/game/join`, {
             method: "POST",
