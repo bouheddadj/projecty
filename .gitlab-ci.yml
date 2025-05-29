@@ -75,9 +75,9 @@ deploy_api_game:
     - apk add --no-cache openssh-client rsync
     - chmod 400 $CI_SSH_KEY
   script:
-    - scp -r $SSH_OPTIONS api/* $DEPLOY_USER@$DEPLOY_HOST:/opt/api-game
+    - scp -r $SSH_OPTIONS api/* $DEPLOY_USER@$DEPLOY_HOST:/opt/api
     - ssh $SSH_OPTIONS $DEPLOY_USER@$DEPLOY_HOST "
-      cd /opt/api-game &&
+      cd /opt/api &&
       rm -rf node_modules &&
       npm ci &&
       pm2 start ecosystem.config.cjs --env production
