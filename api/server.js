@@ -4,6 +4,8 @@ import process from "process";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 import cors from "cors";
+import axios from "axios";
+import https from "https";
 import gameRouter from "./routes/gameRouter.js";
 import adminRouter from "./routes/adminRouter.js";
 
@@ -14,6 +16,9 @@ const envFile =
 dotenv.config({ path: envFile });
 
 const BASE_URL_USERS = process.env.BASE_URL_USERS;
+
+// Ignorer les erreurs SSL si certificat auto-signé (utile en dev)
+const httpsAgent = new https.Agent({ rejectUnauthorized: false });
 
 function parseJwt(token) {
   const base64 = token.split(".")[1];
@@ -26,13 +31,11 @@ const isAuthenticated = async (req, res, next) => {
     return next();
   }
 
-  // Sinon, le comportement réel
   const authHeader = req.headers["authorization"];
-  const origin = req.headers["origin"] || "http://localhost:";
-  console.log(`Origin: ${origin}`);
+  const origin = req.headers["origin"] || "http://localhost";
 
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ error: "Unauthorized" });
+  if (!authHeader || !authHeader.toLowerCase().startsWith("bearer ")) {
+    return res.status(401).json({ error: "Unauthorized: Token manquant" });
   }
 
   const token = authHeader.split(" ")[1];
@@ -41,11 +44,12 @@ const isAuthenticated = async (req, res, next) => {
     const url = `${BASE_URL_USERS}/authenticate?jwt=${token}&origin=${encodeURIComponent(
       origin
     )}`;
-    console.log(url);
-    const response = await fetch(url, { method: "GET" });
+    console.log(`Authentification via : ${url}`);
 
-    if (!response.ok) {
-      return res.status(401).json({ error: "Unauthorized: token rejected" });
+    const response = await axios.get(url, { httpsAgent });
+
+    if (response.status !== 200) {
+      return res.status(401).json({ error: "Unauthorized: Token invalide" });
     }
 
     const payload = parseJwt(token);
@@ -56,16 +60,15 @@ const isAuthenticated = async (req, res, next) => {
 
     next();
   } catch (err) {
-    res
-      .status(500)
-      .json({ error: "Internal Server Error", details: err.message });
+    console.error("Erreur dans isAuthenticated :", err.message);
+    res.status(500).json({ error: "Erreur serveur", details: err.message });
   }
 };
 
 const isAdmin = async (req, res, next) => {
   await isAuthenticated(req, res, () => {
     if (req.user?.species !== "ADMIN") {
-      return res.status(403).json({ error: "Forbidden: Admin only" });
+      return res.status(403).json({ error: "Accès refusé : Admin uniquement" });
     }
     next();
   });
@@ -101,11 +104,7 @@ const app = createServer();
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log(`Serveur démarré sur http://localhost:${PORT}`);
-  console.log(
-    process.env.NODE_ENV === "production"
-      ? "Environnement de production"
-      : "Environnement de développement"
-  );
+  console.log(`✅ Serveur démarré sur http://localhost:${PORT}`);
+  console.log(`🌍 Environnement : ${process.env.NODE_ENV}`);
   console.log(`🔗 BASE_URL_USERS = ${BASE_URL_USERS}`);
 });

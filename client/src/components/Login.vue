@@ -93,7 +93,6 @@ export default defineComponent({
             method: "POST",
             headers: {
               Authorization: `Bearer ${token}`,
-              origin: `http://localhost:5173`,
             },
           });
         }

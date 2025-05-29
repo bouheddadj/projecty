@@ -127,7 +127,9 @@ export default {
 
       try {
         const res = await fetch(`${API_URL_GAME}/game/resources`, {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         });
 
         const resources = await res.json();
