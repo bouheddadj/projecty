@@ -16,8 +16,6 @@ const envFile =
 dotenv.config({ path: envFile });
 
 const BASE_URL_USERS = process.env.BASE_URL_USERS;
-
-// Ignorer les erreurs SSL si certificat auto-signé (utile en dev)
 const httpsAgent = new https.Agent({ rejectUnauthorized: false });
 
 function parseJwt(token) {
@@ -32,36 +30,43 @@ const isAuthenticated = async (req, res, next) => {
   }
 
   const authHeader = req.headers["authorization"];
-  const origin = req.headers["origin"] || "http://localhost";
+  const origin = req.headers["origin"] || "https://192.168.75.33";
 
   if (!authHeader || !authHeader.toLowerCase().startsWith("bearer ")) {
     return res.status(401).json({ error: "Unauthorized: Token manquant" });
   }
 
   const token = authHeader.split(" ")[1];
+  const url = `${BASE_URL_USERS}/authenticate?jwt=${token}&origin=${encodeURIComponent(
+    origin
+  )}`;
 
   try {
-    const url = `${BASE_URL_USERS}/authenticate?jwt=${token}&origin=${encodeURIComponent(
-      origin
-    )}`;
-    console.log(`Authentification via : ${url}`);
+    console.log(`🔐 Authentification via : ${url}`);
+    const response = await axios.get(url, {
+      httpsAgent,
+      headers: {
+        Origin: origin,
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+      },
+    });
 
-    const response = await axios.get(url, { httpsAgent });
-
-    if (response.status !== 200) {
-      return res.status(401).json({ error: "Unauthorized: Token invalide" });
+    if (response.status === 204 || response.status === 200) {
+      const payload = parseJwt(token);
+      req.user = {
+        id: payload.sub,
+        species: payload.species,
+      };
+      return next();
     }
 
-    const payload = parseJwt(token);
-    req.user = {
-      id: payload.sub,
-      species: payload.species,
-    };
-
-    next();
+    return res.status(401).json({ error: "Unauthorized: Token rejeté" });
   } catch (err) {
     console.error("Erreur dans isAuthenticated :", err.message);
-    res.status(500).json({ error: "Erreur serveur", details: err.message });
+    const code = err.response?.status || 500;
+    const details = err.response?.data || err.message;
+    return res.status(code).json({ error: "Erreur serveur", details });
   }
 };
 
