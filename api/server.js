@@ -4,7 +4,7 @@ import process from "process";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 import cors from "cors";
-import axios from "axios";
+import fetch from "node-fetch";
 import https from "https";
 import gameRouter from "./routes/gameRouter.js";
 import adminRouter from "./routes/adminRouter.js";
@@ -43,11 +43,13 @@ const isAuthenticated = async (req, res, next) => {
 
   try {
     console.log(`🔐 Authentification via : ${url}`);
-    const response = await axios.get(url, {
-      httpsAgent,
+
+    const response = await fetch(url, {
+      method: "GET",
+      agent: httpsAgent,
       headers: {
-        Origin: origin,
         Authorization: `Bearer ${token}`,
+        Origin: origin,
         Accept: "application/json",
       },
     });
@@ -63,10 +65,10 @@ const isAuthenticated = async (req, res, next) => {
 
     return res.status(401).json({ error: "Unauthorized: Token rejeté" });
   } catch (err) {
-    console.error("Erreur dans isAuthenticated :", err.message);
-    const code = err.response?.status || 500;
-    const details = err.response?.data || err.message;
-    return res.status(code).json({ error: "Erreur serveur", details });
+    console.error("❌ Erreur dans isAuthenticated :", err.message);
+    return res
+      .status(500)
+      .json({ error: "Erreur serveur", details: err.message });
   }
 };
 
