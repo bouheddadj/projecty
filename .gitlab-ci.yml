@@ -97,7 +97,7 @@ deploy_admin:
     - echo \"$ENV_PRODUCTION_ADMIN\" > .env.production
     - npm ci
     - npm run build
-    - scp -r $SSH_OPTIONS dist/* $DEPLOY_USER@$DEPLOY_HOST:/usr/share/nginx/html/secret/
+    - scp -r $SSH_OPTIONS dist/* $DEPLOY_USER@$DEPLOY_HOST:/usr/share/nginx/html/secret/admin
 
 deploy_front:
   stage: deploy
