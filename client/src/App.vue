@@ -1,5 +1,5 @@
 <template>
-  <div class="app-wrapper">
+  <div class="app-layout">
     <header class="app-header">
       <h1>Panique au Musée</h1>
 
@@ -9,7 +9,7 @@
       </nav>
     </header>
 
-    <main class="main-content">
+    <main class="main-container">
       <RouterView />
     </main>
   </div>
@@ -27,7 +27,6 @@ export default {
   },
   setup() {
     const route = useRoute();
-
     const showMenu = computed(() =>
       ["/login", "/register"].includes(route.path),
     );
@@ -38,59 +37,91 @@ export default {
 </script>
 
 <style scoped>
-.app-wrapper {
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&display=swap");
+
+.app-layout {
+  height: 100vh;
+  width: 100vw;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-  background: #f9f9f9;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: #0b0b0b;
+  color: #f0f0f0;
+  font-family: "Playfair Display", serif;
+  overflow: hidden;
 }
 
 .app-header {
-  background-color: #fff;
+  background: linear-gradient(to right, #111, #1c1c1c);
   padding: 1rem 2rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  border-bottom: 1px solid #333;
+  text-align: center;
+  flex-shrink: 0;
 }
 
 .app-header h1 {
+  font-size: 1.8rem;
+  color: #e3c77b;
+  text-transform: uppercase;
   margin: 0;
-  color: #333;
-  font-size: 2rem;
+  letter-spacing: 1px;
 }
 
 .navbar {
-  margin-top: 1rem;
+  margin-top: 0.5rem;
   display: flex;
+  justify-content: center;
   gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .nav-link {
   text-decoration: none;
-  color: #333;
+  color: #f0f0f0;
   font-weight: 500;
   padding: 0.4rem 0.8rem;
   border-radius: 6px;
-  transition:
-    background-color 0.2s,
-    color 0.2s;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
 }
 
 .nav-link:hover {
-  background-color: #e0f7f1;
-  color: #007e6a;
+  background-color: #1e1e1e;
+  border-color: #e3c77b;
+  color: #e3c77b;
 }
 
 .router-link-exact-active {
-  color: #42b983;
   font-weight: bold;
-  border-bottom: 2px solid #42b983;
+  color: #e3c77b;
+  border-bottom: 2px solid #e3c77b;
 }
 
-.main-content {
+.main-container {
   flex: 1;
-  padding: 2rem;
+  display: flex;
+  overflow: hidden;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .app-header h1 {
+    font-size: 1.4rem;
+  }
+
+  .navbar {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .nav-link {
+    font-size: 0.95rem;
+  }
+
+  .main-container {
+    padding: 1rem;
+  }
 }
 </style>

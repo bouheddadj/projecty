@@ -54,18 +54,18 @@ deploy_api_users:
   script:
     - scp $SSH_OPTIONS users/target/users.war $DEPLOY_USER@$DEPLOY_HOST:$API_DEPLOY_PATH
 
-deploy_test_express:
-  stage: deploy
-  only:
-    - main
-  script:
-    - scp -r $SSH_OPTIONS express/* $DEPLOY_USER@$DEPLOY_HOST:/opt/express
-    - ssh $SSH_OPTIONS $DEPLOY_USER@$DEPLOY_HOST "
-      cd /opt/express &&
-      rm -rf node_modules &&
-      npm ci &&
-      pm2 restart server.js --name express-server
-      "
+# deploy_test_express:
+#   stage: deploy
+#   only:
+#     - main
+#   script:
+#     - scp -r $SSH_OPTIONS express/* $DEPLOY_USER@$DEPLOY_HOST:/opt/express
+#     - ssh $SSH_OPTIONS $DEPLOY_USER@$DEPLOY_HOST "
+#       cd /opt/express &&
+#       rm -rf node_modules &&
+#       npm ci &&
+#       pm2 restart server.js --name express-server
+#       "
 
 deploy_api_game:
   stage: deploy

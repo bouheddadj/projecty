@@ -106,35 +106,44 @@ export default {
 </script>
 
 <style scoped>
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&display=swap");
+
 .register-page {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 90vh;
-  background: #f3f4f6;
+  min-height: 100vh;
+  background: #0b0b0b;
   padding: 2rem;
+  font-family: "Playfair Display", serif;
+  color: #f0f0f0;
+  box-sizing: border-box;
 }
 
 .register-card {
-  background: white;
+  background: #161616;
   padding: 2rem 2.5rem;
   border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 20px rgba(227, 199, 123, 0.1);
   width: 100%;
-  max-width: 400px;
+  max-width: 420px;
   text-align: center;
+  box-sizing: border-box;
+  border: 1px solid #333;
 }
 
 h1 {
   margin-bottom: 0.5rem;
-  font-size: 1.8rem;
-  color: #333;
+  font-size: 2rem;
+  color: #e3c77b;
+  letter-spacing: 1px;
+  text-transform: uppercase;
 }
 
 .intro {
   margin-bottom: 1.5rem;
-  color: #666;
-  font-size: 0.95rem;
+  color: #bbb;
+  font-size: 1rem;
 }
 
 .form-group {
@@ -146,38 +155,77 @@ label {
   display: block;
   margin-bottom: 6px;
   font-weight: 600;
-  color: #444;
+  color: #e3c77b;
 }
 
 input,
 select {
   width: 100%;
   padding: 0.65rem;
-  border: 1px solid #ccc;
+  border: 1px solid #555;
   border-radius: 6px;
   font-size: 1rem;
+  background: #1f1f1f;
+  color: #fff;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+
+input:focus,
+select:focus {
+  border-color: #e3c77b;
+  outline: none;
 }
 
 button {
   width: 100%;
   padding: 0.75rem;
-  background-color: #42b983;
-  color: white;
+  background-color: #e3c77b;
+  color: #0b0b0b;
   font-size: 1rem;
   font-weight: bold;
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition:
+    background-color 0.2s,
+    transform 0.1s;
 }
 
 button:hover {
-  background-color: #369b6e;
+  background-color: #cfb45e;
+  transform: translateY(-1px);
 }
 
 .message {
   margin-top: 1rem;
-  color: #333;
+  color: #e3c77b;
   font-weight: 500;
+  font-size: 0.95rem;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .register-page {
+    padding: 1rem;
+  }
+
+  .register-card {
+    padding: 1.5rem 1rem;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  .intro {
+    font-size: 0.95rem;
+  }
+
+  input,
+  select,
+  button {
+    font-size: 0.95rem;
+  }
 }
 </style>

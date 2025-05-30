@@ -1,35 +1,195 @@
-@import "./base.css";
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&display=swap");
 
+:root {
+    --main-bg: #0b0b0b;
+    --card-bg: #161616;
+    --accent: #e3c77b;
+    --accent-dark: #cfb45e;
+    --text-color: #f0f0f0;
+    --error-color: #e57373;
+    --success-color: #81c784;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    background-color: var(--main-bg);
+    font-family: "Playfair Display", serif;
+    color: var(--text-color);
+}
+
+/* App container */
 #app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  font-weight: normal;
-}
-
-a,
-.green {
-  text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-  padding: 3px;
-}
-
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
-  }
-}
-
-@media (min-width: 1024px) {
-  body {
+    height: 100%;
+    width: 100%;
     display: flex;
-    place-items: center;
-  }
+    flex-direction: column;
+    overflow: hidden;
+}
 
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
-  }
+/* Utility containers */
+.page {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+}
+
+.card {
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 0 16px rgba(227, 199, 123, 0.15);
+    width: 100%;
+    max-width: 420px;
+    border: 1px solid #2a2a2a;
+}
+
+h1,
+h2 {
+    color: var(--accent);
+    font-size: 1.8rem;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.intro {
+    text-align: center;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+    color: #ccc;
+}
+
+.form-group {
+    margin-bottom: 0.8rem;
+    text-align: left;
+}
+
+label {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--accent);
+    font-weight: 600;
+}
+
+input,
+select {
+    width: 100%;
+    padding: 0.6rem;
+    font-size: 1rem;
+    border: 1px solid #444;
+    border-radius: 6px;
+    background: #1f1f1f;
+    color: var(--text-color);
+}
+
+input:focus,
+select:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+button {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: var(--accent);
+    color: var(--main-bg);
+    font-weight: bold;
+    font-size: 1rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    margin-top: 0.5rem;
+}
+
+button:hover {
+    background-color: var(--accent-dark);
+    transform: translateY(-1px);
+}
+
+.message,
+.feedback-message {
+    margin-top: 0.5rem;
+    text-align: center;
+    font-weight: bold;
+    font-size: 0.95rem;
+}
+
+.feedback-message.success {
+    background-color: var(--success-color);
+    color: #1b5e20;
+    border-radius: 6px;
+    padding: 0.5rem;
+}
+
+.feedback-message.error {
+    background-color: var(--error-color);
+    color: #b71c1c;
+    border-radius: 6px;
+    padding: 0.5rem;
+}
+
+/* Map container styling */
+.map {
+    height: 300px;
+    width: 100%;
+    border-radius: 8px;
+    border: 1px solid #333;
+    margin-bottom: 1rem;
+    overflow: hidden;
+}
+
+/* Ensure map page layout fits */
+.map-page {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+}
+
+.map-card {
+    background: var(--card-bg);
+    padding: 1rem;
+    border-radius: 12px;
+    box-shadow: 0 0 16px rgba(227, 199, 123, 0.1);
+    width: 100%;
+    max-width: 420px;
+    text-align: center;
+    overflow: hidden;
+}
+
+/* Mobile adjustments */
+@media (max-width: 480px) {
+
+    .card,
+    .map-card {
+        padding: 1.25rem 1rem;
+    }
+
+    h1,
+    h2 {
+        font-size: 1.5rem;
+    }
+
+    input,
+    button,
+    select {
+        font-size: 0.95rem;
+    }
+
+    .map {
+        height: 240px;
+    }
 }
