@@ -95,7 +95,7 @@ export default {
 
       return L.divIcon({
         className: "",
-        html: `<div class="marker-wrapper marker-${type}"><span class="icon">${
+        html: `<div class="marker-wrapper marker-${type}"><span class="icon">$${
           type === "policier"
             ? "👮‍♂️"
             : type === "voleur"
@@ -123,32 +123,50 @@ export default {
 
         resources.forEach((r: any) => {
           if (!r.position) return;
-          const marker = L.marker(r.position, { icon: getIcon(r) })
-            .addTo(map)
-            .bindPopup(() => {
-              if (r.TTL) {
-                const vitrine = store.vitrinesAvecInfos.find(
-                  (v) => v.id === r.id,
-                );
-                const ttl = vitrine ? vitrine.ttl.toFixed(1) : "??";
-                const dist = store.currentUser?.position
-                  ? Math.round(
-                      Math.sqrt(
-                        Math.pow(
-                          store.currentUser.position[0] - r.position[0],
-                          2,
-                        ) +
-                          Math.pow(
-                            store.currentUser.position[1] - r.position[1],
-                            2,
-                          ),
-                      ) * 111139,
-                    )
-                  : "?";
-                return `TTL : ${ttl}s<br>Distance : ${dist}m`;
+
+          const marker = L.marker(r.position, { icon: getIcon(r) }).addTo(map);
+
+          if (r.TTL) {
+            const vitrine = store.vitrinesAvecInfos.find((v) => v.id === r.id);
+            const div = document.createElement("div");
+            div.style.minWidth = "120px";
+
+            const ttlEl = document.createElement("div");
+            ttlEl.style.fontWeight = "bold";
+            ttlEl.style.marginBottom = "4px";
+
+            const dist = store.currentUser?.position
+              ? Math.round(
+                  Math.sqrt(
+                    Math.pow(store.currentUser.position[0] - r.position[0], 2) +
+                      Math.pow(
+                        store.currentUser.position[1] - r.position[1],
+                        2,
+                      ),
+                  ) * 111139,
+                )
+              : "?";
+
+            const distEl = document.createElement("div");
+            distEl.innerHTML = `Distance : ${dist}m`;
+
+            div.appendChild(ttlEl);
+            div.appendChild(distEl);
+
+            const updateTTL = () => {
+              const vitrineNow = store.vitrinesAvecInfos.find(
+                (v) => v.id === r.id,
+              );
+              if (vitrineNow) {
+                ttlEl.innerHTML = `TTL : ${vitrineNow.ttl.toFixed(1)}s`;
+                requestAnimationFrame(updateTTL);
               }
-              return r.species || r.id;
-            });
+            };
+            updateTTL();
+            marker.bindPopup(div);
+          } else {
+            marker.bindPopup(r.species || r.id);
+          }
 
           marker.on("click", async () => {
             if (r.TTL && r.id) {

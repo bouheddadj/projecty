@@ -46,7 +46,7 @@ const isAuthenticated = async (req, res, next) => {
 
     const response = await fetch(url, {
       method: "GET",
-      agent: httpsAgent,
+      //   agent: httpsAgent,
       headers: {
         Authorization: `Bearer ${token}`,
         Origin: origin,
