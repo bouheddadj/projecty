@@ -217,7 +217,11 @@ export default {
 
       drawZRR(map);
       loadResources(map);
-      setInterval(() => loadResources(map), 5000);
+      setInterval(() => {
+        loadResources(map);
+        const token = localStorage.getItem("token");
+        if (token) store.decrementShowcasesTTL(token);
+      }, 1000);
       setInterval(() => (store.lastUpdate = Date.now()), 1000);
     });
 

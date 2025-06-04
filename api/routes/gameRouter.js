@@ -92,14 +92,30 @@ gameRouter.put("/profile/login", async (req, res) => {
   return res.status(200).json({ message: "Login mis à jour avec succès" });
 });
 
+// Nettoyage automatique des vitrines expirées à chaque requête de ressources
+// (côté API, suppression des vitrines dont TTL <= 0)
 gameRouter.get("/resources", async (req, res) => {
   const data = await readData();
   const userSpecies = req.user.species;
 
+  // Mise à jour du TTL des vitrines (décrémentation en temps réel)
+  const now = Date.now();
+  if (!data._lastTtlUpdate) data._lastTtlUpdate = now;
+  const elapsed = (now - data._lastTtlUpdate) / 1000;
+  if (elapsed > 0) {
+    (data.vitrines || []).forEach((v) => {
+      if (v.TTL && v.TTL > 0) v.TTL = Math.max(0, v.TTL - elapsed);
+    });
+    data._lastTtlUpdate = now;
+    // Nettoyage des vitrines expirées
+    data.vitrines = (data.vitrines || []).filter((v) => v.TTL > 0);
+    await writeData(data);
+  }
+
   const players = (data.players || []).filter(
     (p) => p.position && (userSpecies === "ADMIN" || p.species === userSpecies)
   );
-  const vitrines = (data.vitrines || []).filter((v) => v.TTL > 0);
+  const vitrines = data.vitrines;
 
   res.json([...players, ...vitrines]);
 });
@@ -199,6 +215,24 @@ gameRouter.get("/zrr", async (req, res) => {
   const data = await readData();
   if (!data.zrr) return res.status(404).json({ error: "ZRR not defined" });
   res.json([data.zrr.point1, data.zrr.point2]);
+});
+
+gameRouter.put("/resources/:id", async (req, res) => {
+  const { id } = req.params;
+  const { TTL } = req.body;
+  const data = await readData();
+  if (TTL !== undefined) {
+    // Met à jour le TTL
+    const vitrine = (data.vitrines || []).find((v) => v.id === id);
+    if (vitrine) {
+      vitrine.TTL = TTL;
+      data.vitrines = data.vitrines.filter((v) => v.TTL > 0);
+      await writeData(data);
+      return res.status(200).json({ message: "TTL mis à jour" });
+    }
+    return res.status(404).json({ error: "Vitrine non trouvée" });
+  }
+  return res.status(400).json({ error: "Aucune donnée à mettre à jour" });
 });
 
 export default gameRouter;
