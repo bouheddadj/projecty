@@ -212,7 +212,7 @@ export default {
           if (token) await store.updateServerPosition(token);
         },
         (err) => console.error("Erreur de géolocalisation :", err),
-        { enableHighAccuracy: true, maximumAge: 1000, timeout: 10000 },
+        { enableHighAccuracy: true, maximumAge: 1000, timeout: 20000 },
       );
 
       drawZRR(map);

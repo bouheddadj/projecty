@@ -4,7 +4,7 @@ export const useGameStore = defineStore("game", {
   state: () => ({
     currentUser: {
       login: "",
-      species: "", // "VOLEUR" ou "POLICIER"
+      species: "",
       score: 0,
       position: [0, 0] as [number, number],
     },
