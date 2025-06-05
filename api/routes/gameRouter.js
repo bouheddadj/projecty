@@ -235,4 +235,31 @@ gameRouter.put("/resources/:id", async (req, res) => {
   return res.status(400).json({ error: "Aucune donnée à mettre à jour" });
 });
 
+gameRouter.delete("/resources/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return res.status(400).json({ error: "ID de vitrine requis." });
+    }
+
+    const data = await readData();
+    const vitrines = data.vitrines || [];
+
+    const index = vitrines.findIndex((v) => v.id === id);
+    if (index === -1) {
+      return res.status(404).json({ error: "Vitrine non trouvée." });
+    }
+
+    data.vitrines.splice(index, 1);
+    await writeData(data);
+
+    return res.status(204).send(); // suppression OK, pas de contenu
+  } catch (err) {
+    console.error("Erreur lors de la suppression de la vitrine :", err);
+    return res
+      .status(500)
+      .json({ error: "Erreur serveur lors de la suppression." });
+  }
+});
+
 export default gameRouter;

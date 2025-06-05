@@ -36,12 +36,15 @@ export const useGameStore = defineStore("game", {
       this.currentUser.species = user.species;
       this.currentUser.score = user.score ?? 0;
     },
+
     setUserPosition(pos: [number, number]) {
       this.currentUser.position = pos;
     },
+
     setZrr(bounds: [number, number][]) {
       this.zrr = bounds;
     },
+
     setResources(resources: any[]) {
       this.players = resources.filter(
         (r) =>
@@ -82,6 +85,29 @@ export const useGameStore = defineStore("game", {
       this.zrr = [];
     },
 
+    async deleteShowcase(id: string) {
+      const token = sessionStorage.getItem("token");
+      if (!token) return;
+
+      try {
+        const res = await fetch(
+          `${import.meta.env.VITE_API_URL_GAME}/game/resources/${id}`,
+          {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+
+        if (res.status === 204) {
+          this.showcases = this.showcases.filter((v) => v.id !== id);
+        }
+      } catch (err) {
+        console.error("Erreur suppression vitrine :", err);
+      }
+    },
+
     async interactWithShowcase(id: string, token: string) {
       const type =
         this.currentUser.species === "VOLEUR"
@@ -103,9 +129,9 @@ export const useGameStore = defineStore("game", {
 
         if (res.status === 204) {
           this.currentUser.score += 1;
-          return type === "steal showcase content"
-            ? "Vitrine pillée avec succès."
-            : "Vitrine fermée avec succès.";
+          this.showcases = this.showcases.filter((v) => v.id !== id);
+          await this.deleteShowcase(id);
+          return;
         }
 
         const err = await res.json();
@@ -140,9 +166,8 @@ export const useGameStore = defineStore("game", {
             body: JSON.stringify({ position: this.currentUser.position }),
           },
         );
-        console.log("Position envoyée au serveur :", this.currentUser.position);
       } catch (err) {
-        console.error("Erreur lors de l'envoi de la position :", err);
+        console.error("Erreur envoi position :", err);
       }
     },
   },
