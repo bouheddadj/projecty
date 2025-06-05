@@ -52,7 +52,7 @@ export default {
     const API_URL_USERS = import.meta.env.VITE_API_URL_USERS;
 
     const logout = async () => {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       if (!token) return router.push({ name: "Login" });
 
       try {
@@ -64,7 +64,7 @@ export default {
           method: "POST",
           headers: { Authorization: `Bearer ${token}` },
         });
-        localStorage.removeItem("token");
+        sessionStorage.removeItem("token");
         router.push({ name: "Login" });
       } catch (err) {
         console.error("Erreur de déconnexion :", err);
@@ -76,7 +76,7 @@ export default {
     const drawZRR = (() => {
       let zrrLayer: LeafletLayer | null = null;
       return async (map: LeafletMap) => {
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem("token");
         if (!token) return;
         try {
           const res = await fetch(`${API_URL_GAME}/game/zrr`, {
@@ -164,7 +164,7 @@ export default {
     };
 
     const loadResources = async (map: LeafletMap) => {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       if (!token) return;
       try {
         const res = await fetch(`${API_URL_GAME}/game/resources`, {
@@ -225,7 +225,7 @@ export default {
     };
 
     const decodeToken = () => {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       if (!token) return null;
       try {
         return JSON.parse(atob(token.split(".")[1]));
@@ -239,7 +239,7 @@ export default {
       if (!payload) return router.push({ name: "Login" });
 
       store.setCurrentUser({ login: payload.sub, species: payload.species });
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       if (token) store.updateServerPosition(token);
 
       const map = L.map("map", {
@@ -280,7 +280,7 @@ export default {
       let lastSentPosition: [number, number] | null = null;
       setInterval(() => {
         if (store.currentUser.position) {
-          const token = localStorage.getItem("token");
+          const token = sessionStorage.getItem("token");
           if (
             token &&
             (!lastSentPosition ||
@@ -299,7 +299,7 @@ export default {
 
       // Décrémentation locale du TTL des vitrines toutes les 2 secondes
       setInterval(() => {
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem("token");
         if (token) store.decrementShowcasesTTL(token);
       }, 2000);
     });

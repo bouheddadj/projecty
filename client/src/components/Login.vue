@@ -85,7 +85,7 @@ export default defineComponent({
         if (!tokenHeader) throw new Error("Token manquant dans les headers");
 
         const token = tokenHeader.replace("Bearer ", "");
-        localStorage.setItem("token", token);
+        sessionStorage.setItem("token", token); // 🔁 correction ici
 
         const payload = decodeJWT(token);
         if (!payload || !payload.species) {

@@ -48,16 +48,17 @@ export const useGameStore = defineStore("game", {
           r.species === this.currentUser.species &&
           r.id !== this.currentUser.login,
       );
-      // On garde toutes les vitrines (même TTL=0) pour gestion côté client
       this.showcases = resources.filter((r) => r.TTL !== undefined);
       this.lastUpdate = Date.now();
     },
-    // Ajout : décrémente le TTL côté client et synchronise avec l'API
-    decrementShowcasesTTL(token: string) {
-      this.showcases.forEach(async (v) => {
+
+    async decrementShowcasesTTL() {
+      const token = sessionStorage.getItem("token");
+      if (!token) return;
+
+      for (const v of this.showcases) {
         if (v.TTL > 0) {
           v.TTL = Math.max(0, v.TTL - 1);
-          // Envoie la nouvelle valeur TTL à l'API
           await fetch(
             `${import.meta.env.VITE_API_URL_GAME}/game/resources/${v.id}`,
             {
@@ -70,15 +71,17 @@ export const useGameStore = defineStore("game", {
             },
           );
         }
-      });
-      // Supprime côté client les vitrines TTL=0
+      }
+
       this.showcases = this.showcases.filter((v) => v.TTL > 0);
     },
+
     clearGame() {
       this.players = [];
       this.showcases = [];
       this.zrr = [];
     },
+
     async interactWithShowcase(id: string, token: string) {
       const type =
         this.currentUser.species === "VOLEUR"
@@ -120,7 +123,11 @@ export const useGameStore = defineStore("game", {
         return "Erreur réseau : impossible de contacter le serveur.";
       }
     },
-    async updateServerPosition(token: string) {
+
+    async updateServerPosition() {
+      const token = sessionStorage.getItem("token");
+      if (!token) return;
+
       try {
         await fetch(
           `${import.meta.env.VITE_API_URL_GAME}/game/resources/${this.currentUser.login}/position`,

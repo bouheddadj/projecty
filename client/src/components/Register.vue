@@ -6,7 +6,7 @@
         <p class="intro">Rejoins l'aventure au musée !</p>
       </header>
 
-      <form @submit.prevent="register" class="register-form">
+      <form @submit.prevent="register" class="register-form" autocomplete="off">
         <div class="form-group">
           <label for="username">Nom d'utilisateur</label>
           <input
@@ -44,7 +44,6 @@
             id="avatar"
             type="url"
             placeholder="https://exemple.com/avatar.png"
-            autocomplete="off"
           />
         </div>
 
@@ -126,6 +125,9 @@ export default {
   justify-content: center;
   align-items: center;
   padding: 2rem 1rem;
+  min-height: calc(100vh - 80px);
+  background-color: var(--main-bg);
+  box-sizing: border-box;
   overflow: hidden;
 }
 
@@ -136,7 +138,7 @@ export default {
   box-shadow: 0 4px 12px var(--shadow-color);
   border: 1px solid var(--border-color);
   width: 100%;
-  max-width: 520px;
+  max-width: 540px;
   box-sizing: border-box;
 }
 
@@ -229,7 +231,7 @@ button:hover {
 
 @media (max-width: 640px) {
   .register-container {
-    padding: 1.2rem;
+    padding: 1.25rem 1rem;
   }
 
   h1 {
@@ -244,11 +246,6 @@ button:hover {
   select,
   button {
     font-size: 0.95rem;
-  }
-
-  .page.register-page {
-    min-height: auto;
-    padding-top: 2rem;
   }
 }
 </style>

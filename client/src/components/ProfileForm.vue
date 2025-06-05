@@ -52,7 +52,7 @@ export default defineComponent({
     const API_URL_USERS = import.meta.env.VITE_API_URL_USERS;
 
     const updateProfile = async () => {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       if (!token) {
         message.value = "Vous devez être connecté.";
         return;
@@ -83,7 +83,7 @@ export default defineComponent({
 
         const newToken = res.headers.get("Authorization");
         if (newToken?.startsWith("Bearer ")) {
-          localStorage.setItem("token", newToken.replace("Bearer ", ""));
+          sessionStorage.setItem("token", newToken.replace("Bearer ", ""));
           router.push("/login");
         }
 
