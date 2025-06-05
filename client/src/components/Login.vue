@@ -101,6 +101,12 @@ export default defineComponent({
 
         emit("loginEvent", token);
         router.push({ name: "Map" });
+        if (Notification.permission === "granted") {
+          new Notification("Connexion réussie", {
+            body: `Bienvenue ${username.value} !`,
+            icon: "/pwa-192x192.png",
+          });
+        }
       } catch (err: any) {
         const errorMessage = err.message || "Erreur de connexion";
         emit("loginError", errorMessage);

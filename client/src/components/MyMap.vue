@@ -66,6 +66,17 @@ export default {
         });
         sessionStorage.removeItem("token");
         router.push({ name: "Login" });
+
+        if (Notification.permission === "granted") {
+          new Notification("Déconnexion", {
+            body: "Vous êtes bien déconnecté.",
+            icon: "/pwa-192x192.png",
+          });
+        }
+
+        setTimeout(() => {
+          router.push({ name: "Login" });
+        }, 500);
       } catch (err) {
         console.error("Erreur de déconnexion :", err);
       }
