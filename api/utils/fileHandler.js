@@ -21,11 +21,15 @@ export async function readData() {
   }
 }
 
-// Fonction pour écrire dans le fichier
+let writeQueue = Promise.resolve();
+
 export async function writeData(data) {
-  try {
-    await fs.writeFile(dataPath, JSON.stringify(data, null, 2), "utf-8");
-  } catch (e) {
-    console.error("Erreur écriture JSON :", e);
-  }
+  writeQueue = writeQueue.then(async () => {
+    try {
+      await fs.writeFile(dataPath, JSON.stringify(data, null, 2), "utf-8");
+    } catch (e) {
+      console.error("Erreur écriture JSON :", e);
+    }
+  });
+  return writeQueue;
 }

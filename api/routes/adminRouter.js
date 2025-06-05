@@ -147,6 +147,29 @@ adminRouter.post("/randomShowcase", async (req, res) => {
   });
 });
 
+// Route GET pour récupérer le TTL global
+adminRouter.get("/ttl", async (req, res) => {
+  const data = await readData();
+  res.json({ ttl: data.ttl || 60 });
+});
+
+// Route POST pour ajouter une vitrine à une position précise (admin)
+adminRouter.post("/showcase", async (req, res) => {
+  const { position, TTL } = req.body;
+  if (!position || !Array.isArray(position) || position.length !== 2) {
+    return res.status(400).json({ error: "Position invalide" });
+  }
+  const data = await readData();
+  data.vitrines = data.vitrines || [];
+  data.vitrines.push({
+    id: uuidv4(),
+    position,
+    TTL: TTL || data.ttl || 60,
+  });
+  await writeData(data);
+  res.status(201).json({ message: "Vitrine ajoutée" });
+});
+
 adminRouter.delete("/showcases", async (req, res) => {
   try {
     const data = await readData();
