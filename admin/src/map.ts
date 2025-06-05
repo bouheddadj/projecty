@@ -147,50 +147,6 @@ export async function loadResources(map: L.Map): Promise<void> {
 
       marker.bindPopup(label);
       resourceMarkers.push(marker);
-
-      // Ajout du comportement : clic sur vitrine => suppression si à moins de 5m
-      if (resource.TTL) {
-        marker.on("click", async () => {
-          try {
-            const token = getToken();
-            if (!token) return;
-            // Récupérer la position du joueur courant
-            const meRes = await fetch(`${apiBaseUrl}/game/resources/me`, {
-              method: "GET",
-              headers: { Authorization: token },
-            });
-            if (!meRes.ok) return;
-            const me = await meRes.json();
-            if (!me.position) return;
-            // Calcul de la distance (Haversine)
-            const toRad = (v: number) => (v * Math.PI) / 180;
-            const [lat1, lng1] = me.position;
-            const [lat2, lng2] = resource.position;
-            const R = 6371000;
-            const dLat = toRad(lat2 - lat1);
-            const dLng = toRad(lng2 - lng1);
-            const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-            const dist = R * c;
-            if (dist <= 5) {
-              // Suppression de la vitrine (mettre TTL=0 via API)
-              await fetch(`${apiBaseUrl}/admin/showcase`, {
-                method: "PUT",
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: token,
-                },
-                body: JSON.stringify({ id: resource.id, TTL: 0 }),
-              });
-              loadResources(map);
-            } else {
-              alert("Vous devez être à moins de 5m de la vitrine pour l'ouvrir.");
-            }
-          } catch (err) {
-            console.error("Erreur suppression vitrine:", err);
-          }
-        });
-      }
     });
   } catch (err) {
     console.error("Erreur chargement ressources :", err);
