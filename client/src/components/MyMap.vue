@@ -1,5 +1,5 @@
 <template>
-  <div class="map-page">
+  <section class="map-page">
     <div class="map-card">
       <h1>🎮 Carte du Jeu</h1>
       <p class="intro">Surveille ton environnement et agis rapidement !</p>
@@ -8,10 +8,12 @@
 
       <div id="map" class="map" ref="map"></div>
 
-      <button @click="goToProfile" class="profile-button">
-        Modifier mon profil
-      </button>
-      <button @click="logout">Quitter le jeu</button>
+      <div class="action-buttons">
+        <button @click="goToProfile" class="profile-button">
+          Modifier mon profil
+        </button>
+        <button @click="logout" class="logout-button">Quitter le jeu</button>
+      </div>
 
       <div
         v-if="showMessage"
@@ -20,7 +22,7 @@
         {{ showMessage }}
       </div>
     </div>
-  </div>
+  </section>
 </template>
 
 <script lang="ts">
@@ -316,78 +318,122 @@ export default {
 
 <style scoped>
 .map-page {
+  flex: 1;
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
-  background-color: #f0f0f0;
+  padding: 2rem 1rem;
+  background-color: var(--main-bg);
+  min-height: calc(100vh - 80px); /* Prend en compte la hauteur de l'en-tête */
+  box-sizing: border-box;
 }
 
 .map-card {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  padding: 16px;
-  width: 90%;
-  max-width: 800px;
+  background: var(--card-bg);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px var(--shadow-color);
+  padding: 2rem;
+  width: 100%;
+  max-width: 840px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 h1 {
-  font-size: 24px;
-  margin-bottom: 8px;
+  font-size: 1.6rem;
   text-align: center;
+  color: var(--accent);
 }
 
 .intro {
-  font-size: 16px;
-  margin-bottom: 16px;
   text-align: center;
+  color: var(--text-muted);
 }
 
 .score-display {
-  background: #4caf50;
+  background: var(--success-color);
   color: white;
-  padding: 8px;
-  border-radius: 4px;
+  padding: 0.75rem;
+  border-radius: 6px;
   text-align: center;
-  margin-bottom: 16px;
+  font-weight: 600;
 }
 
 .map {
-  height: 400px;
-  margin-bottom: 16px;
-  border-radius: 4px;
+  height: 420px;
+  width: 100%;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.profile-button,
+.logout-button {
+  flex: 1 1 48%;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    transform 0.1s ease;
 }
 
 .profile-button {
-  background: #007bff;
+  background: var(--accent);
   color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 16px;
-  margin-right: 8px;
+}
+
+.logout-button {
+  background: var(--error-color);
+  color: white;
 }
 
 .profile-button:hover {
-  background: #0056b3;
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+}
+
+.logout-button:hover {
+  background: #b71c1c;
+  transform: translateY(-1px);
 }
 
 .feedback-message {
-  padding: 10px;
-  border-radius: 4px;
-  margin-top: 16px;
+  padding: 0.75rem;
+  border-radius: 6px;
   text-align: center;
-}
-
-.error {
-  background: #f44336;
-  color: white;
+  font-weight: 500;
 }
 
 .success {
-  background: #4caf50;
-  color: white;
+  background-color: var(--success-color);
+  color: #fff;
+}
+
+.error {
+  background-color: var(--error-color);
+  color: #fff;
+}
+
+@media (max-width: 640px) {
+  .map-card {
+    padding: 1.25rem 1rem;
+  }
+
+  .map {
+    height: 300px;
+  }
 }
 </style>

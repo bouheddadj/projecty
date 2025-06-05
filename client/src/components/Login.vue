@@ -1,32 +1,40 @@
 <template>
-  <div class="login-page">
-    <div class="login-card">
-      <h1>Panique au Musée</h1>
-      <p class="intro">Connecte-toi pour jouer !</p>
+  <div class="page">
+    <div class="card login-card">
+      <header class="login-header">
+        <h1>Panique au Musée</h1>
+        <p class="intro">Connecte-toi pour jouer !</p>
+      </header>
 
-      <div class="form-group">
-        <label for="login">Login</label>
-        <input
-          type="text"
-          id="login"
-          v-model="username"
-          placeholder="Votre identifiant"
-        />
-      </div>
+      <form @submit.prevent="login" class="login-form">
+        <div class="form-group">
+          <label for="login">Login</label>
+          <input
+            type="text"
+            id="login"
+            v-model="username"
+            placeholder="Votre identifiant"
+            autocomplete="username"
+            required
+          />
+        </div>
 
-      <div class="form-group">
-        <label for="password">Mot de passe</label>
-        <input
-          type="password"
-          id="password"
-          v-model="password"
-          placeholder="Votre mot de passe"
-        />
-      </div>
+        <div class="form-group">
+          <label for="password">Mot de passe</label>
+          <input
+            type="password"
+            id="password"
+            v-model="password"
+            placeholder="Votre mot de passe"
+            autocomplete="current-password"
+            required
+          />
+        </div>
 
-      <button @click="login">Se connecter</button>
+        <button type="submit">Se connecter</button>
 
-      <p v-if="message" class="error">{{ message }}</p>
+        <p v-if="message" class="feedback-message error">{{ message }}</p>
+      </form>
     </div>
   </div>
 </template>
@@ -55,7 +63,7 @@ export default defineComponent({
         const base64 = token.split(".")[1];
         const json = atob(base64);
         return JSON.parse(json);
-      } catch (e) {
+      } catch {
         return null;
       }
     };
@@ -71,14 +79,10 @@ export default defineComponent({
           }),
         });
 
-        if (!response.ok) {
-          throw new Error("Identifiants incorrects");
-        }
+        if (!response.ok) throw new Error("Identifiants incorrects");
 
         const tokenHeader = response.headers.get("Authorization");
-        if (!tokenHeader) {
-          throw new Error("Token manquant dans les headers");
-        }
+        if (!tokenHeader) throw new Error("Token manquant dans les headers");
 
         const token = tokenHeader.replace("Bearer ", "");
         localStorage.setItem("token", token);
@@ -91,9 +95,7 @@ export default defineComponent({
         if (payload.species !== "ADMIN") {
           await fetch(`${API_URL_GAME}/game/join`, {
             method: "POST",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+            headers: { Authorization: `Bearer ${token}` },
           });
         }
 
@@ -106,129 +108,38 @@ export default defineComponent({
       }
     };
 
-    return {
-      username,
-      password,
-      message,
-      login,
-    };
+    return { username, password, message, login };
   },
 });
 </script>
 
 <style scoped>
-@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&display=swap");
-
-.login-page {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  padding: 2rem;
-  background: #0b0b0b;
-  font-family: "Playfair Display", serif;
-  color: #f0f0f0;
-  box-sizing: border-box;
-}
-
 .login-card {
-  background: #161616;
-  padding: 2rem 2.5rem;
-  border-radius: 12px;
-  box-shadow: 0 0 20px rgba(227, 199, 123, 0.15);
-  width: 100%;
-  max-width: 420px;
-  text-align: center;
-  box-sizing: border-box;
-  border: 1px solid #333;
+  max-width: 480px;
 }
 
-h1 {
-  margin-bottom: 0.5rem;
-  font-size: 2rem;
-  color: #e3c77b;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-}
-
-.intro {
+.login-header {
   margin-bottom: 1.5rem;
-  color: #bbb;
-  font-size: 1rem;
 }
 
-.form-group {
-  margin-bottom: 1rem;
-  text-align: left;
-}
-
-label {
-  display: block;
-  margin-bottom: 6px;
-  font-weight: 600;
-  color: #e3c77b;
-}
-
-input {
-  width: 100%;
-  padding: 0.65rem;
-  border: 1px solid #555;
-  border-radius: 6px;
-  font-size: 1rem;
-  background: #1f1f1f;
-  color: #fff;
-  box-sizing: border-box;
-  transition: border-color 0.2s;
-}
-
-input:focus {
-  border-color: #e3c77b;
-  outline: none;
-}
-
-button {
-  width: 100%;
-  padding: 0.75rem;
-  background-color: #e3c77b;
-  color: #0b0b0b;
-  font-size: 1rem;
-  font-weight: bold;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition:
-    background-color 0.2s,
-    transform 0.1s;
-}
-
-button:hover {
-  background-color: #cfb45e;
-  transform: translateY(-1px);
-}
-
-.error {
+.feedback-message.error {
   margin-top: 1rem;
-  color: #e57373;
+  background-color: var(--error-color);
+  color: #fff;
   font-weight: 500;
-  font-size: 0.95rem;
+  padding: 0.5rem;
+  border-radius: 6px;
+  text-align: center;
 }
 
 /* Responsive */
 @media (max-width: 600px) {
-  .login-page {
-    padding: 1rem;
-  }
-
   .login-card {
-    padding: 1.5rem 1rem;
+    padding: 1.25rem 1rem;
   }
 
-  h1 {
-    font-size: 1.5rem;
-  }
-
-  .intro {
-    font-size: 0.95rem;
+  .login-header h1 {
+    font-size: 1.3rem;
   }
 
   input,

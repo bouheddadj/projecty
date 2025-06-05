@@ -1,64 +1,78 @@
-@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap");
 
 :root {
-    --main-bg: #0b0b0b;
-    --card-bg: #161616;
-    --accent: #e3c77b;
-    --accent-dark: #cfb45e;
-    --text-color: #f0f0f0;
-    --error-color: #e57373;
-    --success-color: #81c784;
+    --main-bg: #f9f9f6;
+    --header-bg: #ffffff;
+    --card-bg: #ffffff;
+    --text-color: #1a1a1a;
+    --text-muted: #5f5f5f;
+    --accent: #4361ee;
+    --accent-hover: #3a52cb;
+    --accent-light: #e0e7ff;
+    --success-color: #2e7d32;
+    --error-color: #d32f2f;
+    --info-color: #0288d1;
+    --border-color: #e0e0e0;
+    --input-bg: #f4f4f4;
+    --shadow-color: rgba(0, 0, 0, 0.05);
+    --nav-bg: #e7ecf9;
+    --max-width: 1200px;
 }
 
-* {
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
 }
 
 html,
 body {
-    height: 100vh;
-    width: 100vw;
-    overflow: hidden;
+    min-height: 100%;
     background-color: var(--main-bg);
-    font-family: "Playfair Display", serif;
+    font-family: "Inter", sans-serif;
     color: var(--text-color);
+    line-height: 1.6;
+    overflow-x: hidden;
 }
 
-/* App container */
 #app {
-    height: 100%;
-    width: 100%;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    min-height: 100vh;
 }
 
-/* Utility containers */
+/* Page wrapper */
 .page {
-    height: 100%;
-    width: 100%;
+    flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 1rem;
+    padding: 2rem 1rem;
 }
 
-.card {
+/* Cards */
+.card,
+.map-card,
+.register-card,
+.login-card {
     background: var(--card-bg);
-    padding: 2rem;
+    padding: 1.5rem;
     border-radius: 12px;
-    box-shadow: 0 0 16px rgba(227, 199, 123, 0.15);
+    box-shadow: 0 4px 12px var(--shadow-color);
+    border: 1px solid var(--border-color);
     width: 100%;
-    max-width: 420px;
-    border: 1px solid #2a2a2a;
+    max-width: 480px;
+    margin: 1rem auto;
+    box-sizing: border-box;
 }
 
+/* Typography */
 h1,
 h2 {
     color: var(--accent);
-    font-size: 1.8rem;
+    font-size: 1.75rem;
     text-align: center;
     margin-bottom: 1rem;
 }
@@ -67,29 +81,31 @@ h2 {
     text-align: center;
     margin-bottom: 1rem;
     font-size: 1rem;
-    color: #ccc;
+    color: var(--text-muted);
 }
 
+/* Forms */
 .form-group {
-    margin-bottom: 0.8rem;
+    margin-bottom: 1rem;
     text-align: left;
 }
 
 label {
     display: block;
-    margin-bottom: 4px;
+    margin-bottom: 0.5rem;
     color: var(--accent);
     font-weight: 600;
+    font-size: 0.95rem;
 }
 
 input,
 select {
     width: 100%;
-    padding: 0.6rem;
+    padding: 0.65rem;
     font-size: 1rem;
-    border: 1px solid #444;
+    border: 1px solid var(--border-color);
     border-radius: 6px;
-    background: #1f1f1f;
+    background: var(--input-bg);
     color: var(--text-color);
 }
 
@@ -99,83 +115,63 @@ select:focus {
     border-color: var(--accent);
 }
 
+/* Buttons */
 button {
     width: 100%;
-    padding: 0.75rem;
+    padding: 0.65rem;
     background-color: var(--accent);
-    color: var(--main-bg);
-    font-weight: bold;
+    color: #fff;
+    font-weight: 600;
     font-size: 1rem;
     border: none;
     border-radius: 6px;
     cursor: pointer;
     transition: background-color 0.2s ease, transform 0.1s ease;
-    margin-top: 0.5rem;
+    margin-top: 0.75rem;
 }
 
 button:hover {
-    background-color: var(--accent-dark);
+    background-color: var(--accent-hover);
     transform: translateY(-1px);
 }
 
-.message,
+/* Feedback messages */
 .feedback-message {
-    margin-top: 0.5rem;
+    margin-top: 1rem;
     text-align: center;
-    font-weight: bold;
     font-size: 0.95rem;
+    padding: 0.5rem;
+    border-radius: 6px;
 }
 
 .feedback-message.success {
     background-color: var(--success-color);
-    color: #1b5e20;
-    border-radius: 6px;
-    padding: 0.5rem;
+    color: white;
 }
 
 .feedback-message.error {
     background-color: var(--error-color);
-    color: #b71c1c;
-    border-radius: 6px;
-    padding: 0.5rem;
+    color: white;
 }
 
-/* Map container styling */
+/* Map */
 .map {
-    height: 300px;
     width: 100%;
+    aspect-ratio: 16/9;
     border-radius: 8px;
-    border: 1px solid #333;
+    border: 1px solid var(--border-color);
+    overflow: hidden;
     margin-bottom: 1rem;
-    overflow: hidden;
 }
 
-/* Ensure map page layout fits */
-.map-page {
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 1rem;
-}
-
-.map-card {
-    background: var(--card-bg);
-    padding: 1rem;
-    border-radius: 12px;
-    box-shadow: 0 0 16px rgba(227, 199, 123, 0.1);
-    width: 100%;
-    max-width: 420px;
-    text-align: center;
-    overflow: hidden;
-}
-
-/* Mobile adjustments */
-@media (max-width: 480px) {
+/* Responsive */
+@media (max-width: 768px) {
 
     .card,
-    .map-card {
-        padding: 1.25rem 1rem;
+    .map-card,
+    .register-card,
+    .login-card {
+        padding: 1.25rem;
     }
 
     h1,
@@ -190,6 +186,6 @@ button:hover {
     }
 
     .map {
-        height: 240px;
+        aspect-ratio: 4/3;
     }
 }

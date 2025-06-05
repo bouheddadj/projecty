@@ -1,49 +1,66 @@
 <template>
-  <div class="register-page">
-    <div class="register-card">
-      <h1>Créer un compte</h1>
-      <p class="intro">Rejoins l'aventure au musée !</p>
+  <div class="page register-page">
+    <div class="register-container">
+      <header>
+        <h1>Créer un compte</h1>
+        <p class="intro">Rejoins l'aventure au musée !</p>
+      </header>
 
-      <div class="form-group">
-        <label for="username">Nom d'utilisateur</label>
-        <input
-          v-model="username"
-          id="username"
-          type="text"
-          placeholder="Votre identifiant"
-        />
-      </div>
+      <form @submit.prevent="register" class="register-form">
+        <div class="form-group">
+          <label for="username">Nom d'utilisateur</label>
+          <input
+            v-model="username"
+            id="username"
+            type="text"
+            placeholder="Votre identifiant"
+            autocomplete="username"
+          />
+        </div>
 
-      <div class="form-group">
-        <label for="password">Mot de passe</label>
-        <input
-          v-model="password"
-          id="password"
-          type="password"
-          placeholder="Votre mot de passe"
-        />
-      </div>
+        <div class="form-group">
+          <label for="password">Mot de passe</label>
+          <input
+            v-model="password"
+            id="password"
+            type="password"
+            placeholder="Votre mot de passe"
+            autocomplete="new-password"
+          />
+        </div>
 
-      <div class="form-group">
-        <label for="species">Choisis ton camp</label>
-        <select v-model="species" id="species">
-          <option value="VOLEUR">🕵️‍♂️ Voleur</option>
-          <option value="POLICIER">👮‍♀️ Policier</option>
-        </select>
-      </div>
+        <div class="form-group">
+          <label for="species">Choisis ton camp</label>
+          <select v-model="species" id="species">
+            <option value="VOLEUR">🕵️‍♂️ Voleur</option>
+            <option value="POLICIER">👮‍♀️ Policier</option>
+          </select>
+        </div>
 
-      <div class="form-group">
-        <label for="avatar">URL de votre avatar (optionnel)</label>
-        <input
-          v-model="avatar"
-          id="avatar"
-          type="url"
-          placeholder="https://exemple.com/avatar.png"
-        />
-      </div>
+        <div class="form-group">
+          <label for="avatar">URL de votre avatar (optionnel)</label>
+          <input
+            v-model="avatar"
+            id="avatar"
+            type="url"
+            placeholder="https://exemple.com/avatar.png"
+            autocomplete="off"
+          />
+        </div>
 
-      <button @click="register">S'inscrire</button>
-      <p v-if="message" class="message">{{ message }}</p>
+        <button type="submit">S'inscrire</button>
+
+        <p
+          v-if="message"
+          class="feedback-message"
+          :class="{
+            success: message.includes('succès'),
+            error: message.includes('Erreur'),
+          }"
+        >
+          {{ message }}
+        </p>
+      </form>
     </div>
   </div>
 </template>
@@ -62,14 +79,12 @@ export default {
     const message = ref("");
     const router = useRouter();
 
-    // @ts-ignore
     const API_URL = import.meta.env.VITE_API_URL_USERS;
 
     const defaultAvatars: Record<string, string> = {
-      VOLEUR:
-        "https://www.google.com/imgres?q=voleur%20avatar&imgurl=https%3A%2F%2Fcdn-icons-png.flaticon.com%2F512%2F1126%2F1126954.png&imgrefurl=https%3A%2F%2Fwww.flaticon.com%2Ffr%2Ficone-gratuite%2Fvoleur_1126954&docid=cPUPAxVBBrdtAM&tbnid=MwN6mPWQli4rJM&vet=12ahUKEwj50tqtvbmNAxU1SKQEHWsrAr0QM3oECGsQAA..i&w=512&h=512&hcb=2&itg=1&ved=2ahUKEwj50tqtvbmNAxU1SKQEHWsrAr0QM3oECGsQAA",
+      VOLEUR: "https://cdn-icons-png.flaticon.com/512/1126/1126954.png",
       POLICIER:
-        "https://www.google.com/imgres?q=police%20avatar&imgurl=https%3A%2F%2Fimg.freepik.com%2Fvecteurs-premium%2Ficone-avatar-policier-illustration-plate-icone-vecteur-avatar-policier-isolee-fond-blanc_98396-42919.jpg&imgrefurl=https%3A%2F%2Ffr.freepik.com%2Fvecteurs-premium%2Ficone-avatar-policier-illustration-plate-icone-vecteur-avatar-policier-isolee-fond-blanc_74127171.htm&docid=Ct5paQvi0iW7cM&tbnid=mGVEw6cW_ZKHIM&vet=12ahUKEwiphaSPvbmNAxXBe6QEHYs2BqwQM3oECG4QAA..i&w=626&h=625&hcb=2&ved=2ahUKEwiphaSPvbmNAxXBe6QEHYs2BqwQM3oECG4QAA",
+        "https://img.freepik.com/vecteurs-premium/icone-avatar-policier-illustration-plate_98396-42919.jpg",
     };
 
     const register = async () => {
@@ -106,116 +121,119 @@ export default {
 </script>
 
 <style scoped>
-@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&display=swap");
-
-.register-page {
+.page.register-page {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
-  background: #0b0b0b;
-  padding: 2rem;
-  font-family: "Playfair Display", serif;
-  color: #f0f0f0;
-  box-sizing: border-box;
+  padding: 2rem 1rem;
+  overflow: hidden;
 }
 
-.register-card {
-  background: #161616;
-  padding: 2rem 2.5rem;
+.register-container {
+  background: var(--card-bg);
+  padding: 2rem;
   border-radius: 12px;
-  box-shadow: 0 0 20px rgba(227, 199, 123, 0.1);
+  box-shadow: 0 4px 12px var(--shadow-color);
+  border: 1px solid var(--border-color);
   width: 100%;
-  max-width: 420px;
-  text-align: center;
+  max-width: 520px;
   box-sizing: border-box;
-  border: 1px solid #333;
 }
 
 h1 {
   margin-bottom: 0.5rem;
-  font-size: 2rem;
-  color: #e3c77b;
-  letter-spacing: 1px;
-  text-transform: uppercase;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--accent);
+  text-align: center;
 }
 
 .intro {
-  margin-bottom: 1.5rem;
-  color: #bbb;
+  margin-bottom: 1.25rem;
+  color: var(--text-muted);
   font-size: 1rem;
+  text-align: center;
+}
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 .form-group {
-  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
   text-align: left;
 }
 
 label {
-  display: block;
-  margin-bottom: 6px;
+  margin-bottom: 0.4rem;
   font-weight: 600;
-  color: #e3c77b;
+  color: var(--accent);
+  font-size: 0.95rem;
 }
 
 input,
 select {
-  width: 100%;
-  padding: 0.65rem;
-  border: 1px solid #555;
-  border-radius: 6px;
+  padding: 0.65rem 0.75rem;
   font-size: 1rem;
-  background: #1f1f1f;
-  color: #fff;
-  box-sizing: border-box;
-  transition: border-color 0.2s;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: var(--input-bg);
+  color: var(--text-color);
 }
 
 input:focus,
 select:focus {
-  border-color: #e3c77b;
+  border-color: var(--accent);
   outline: none;
 }
 
 button {
-  width: 100%;
   padding: 0.75rem;
-  background-color: #e3c77b;
-  color: #0b0b0b;
+  background-color: var(--accent);
+  color: white;
+  font-weight: 600;
   font-size: 1rem;
-  font-weight: bold;
   border: none;
   border-radius: 6px;
   cursor: pointer;
   transition:
-    background-color 0.2s,
-    transform 0.1s;
+    background-color 0.2s ease,
+    transform 0.1s ease;
 }
 
 button:hover {
-  background-color: #cfb45e;
+  background-color: var(--accent-hover);
   transform: translateY(-1px);
 }
 
-.message {
+.feedback-message {
   margin-top: 1rem;
-  color: #e3c77b;
-  font-weight: 500;
   font-size: 0.95rem;
+  padding: 0.6rem;
+  border-radius: 6px;
+  text-align: center;
 }
 
-/* Responsive */
-@media (max-width: 600px) {
-  .register-page {
-    padding: 1rem;
-  }
+.feedback-message.success {
+  background-color: var(--success-color);
+  color: white;
+}
 
-  .register-card {
-    padding: 1.5rem 1rem;
+.feedback-message.error {
+  background-color: var(--error-color);
+  color: white;
+}
+
+@media (max-width: 640px) {
+  .register-container {
+    padding: 1.2rem;
   }
 
   h1 {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
   }
 
   .intro {
@@ -226,6 +244,11 @@ button:hover {
   select,
   button {
     font-size: 0.95rem;
+  }
+
+  .page.register-page {
+    min-height: auto;
+    padding-top: 2rem;
   }
 }
 </style>

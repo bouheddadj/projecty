@@ -1,16 +1,21 @@
 <template>
-  <div class="app-layout">
+  <div class="app-root">
     <header class="app-header">
-      <h1>Panique au Musée</h1>
-
-      <nav v-if="showMenu" class="navbar">
-        <RouterLink to="/login" class="nav-link">Connexion</RouterLink>
-        <RouterLink to="/register" class="nav-link">Créer un compte</RouterLink>
-      </nav>
+      <div class="header-inner">
+        <h1 class="logo">🎨 Panique au Musée</h1>
+        <nav v-if="showMenu" class="navbar">
+          <RouterLink to="/login" class="nav-link">Connexion</RouterLink>
+          <RouterLink to="/register" class="nav-link"
+            >Créer un compte</RouterLink
+          >
+        </nav>
+      </div>
     </header>
 
-    <main class="main-container">
-      <RouterView />
+    <main class="app-main">
+      <div class="main-content">
+        <RouterView />
+      </div>
     </main>
   </div>
 </template>
@@ -37,90 +42,124 @@ export default {
 </script>
 
 <style scoped>
-@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap");
 
-.app-layout {
-  height: 100vh;
-  width: 100vw;
+:root {
+  --main-bg: #f9f9f6;
+  --header-bg: #ffffff;
+  --accent: #4361ee;
+  --accent-hover: #3a52cb;
+  --text-color: #1a1a1a;
+  --nav-bg: #e7ecf9;
+  --border-color: #e0e0e0;
+  --shadow-color: rgba(0, 0, 0, 0.05);
+  --max-width: 1200px;
+}
+
+/* Root structure */
+.app-root {
+  background: var(--main-bg);
+  color: var(--text-color);
+  font-family: "Inter", sans-serif;
   display: flex;
   flex-direction: column;
-  background: #0b0b0b;
-  color: #f0f0f0;
-  font-family: "Playfair Display", serif;
-  overflow: hidden;
+  min-height: 100vh;
 }
 
+/* Header */
 .app-header {
-  background: linear-gradient(to right, #111, #1c1c1c);
-  padding: 1rem 2rem;
-  border-bottom: 1px solid #333;
-  text-align: center;
-  flex-shrink: 0;
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--border-color);
+  box-shadow: 0 2px 4px var(--shadow-color);
+  padding: 0.75rem 1.5rem;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
-.app-header h1 {
-  font-size: 1.8rem;
-  color: #e3c77b;
-  text-transform: uppercase;
-  margin: 0;
-  letter-spacing: 1px;
-}
-
-.navbar {
-  margin-top: 0.5rem;
+.header-inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
   display: flex;
-  justify-content: center;
-  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.logo {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.5px;
+  margin: 0;
+}
+
+/* Navigation */
+.navbar {
+  display: flex;
+  gap: 0.5rem;
   flex-wrap: wrap;
 }
 
 .nav-link {
+  font-size: 0.95rem;
+  font-weight: 600;
   text-decoration: none;
-  color: #f0f0f0;
-  font-weight: 500;
-  padding: 0.4rem 0.8rem;
+  background: var(--nav-bg);
+  padding: 0.4rem 0.75rem;
   border-radius: 6px;
-  transition: all 0.2s ease;
-  border: 1px solid transparent;
+  color: var(--text-color);
+  transition:
+    background-color 0.2s,
+    color 0.2s;
 }
 
 .nav-link:hover {
-  background-color: #1e1e1e;
-  border-color: #e3c77b;
-  color: #e3c77b;
+  background-color: var(--accent);
+  color: #fff;
 }
 
 .router-link-exact-active {
-  font-weight: bold;
-  color: #e3c77b;
-  border-bottom: 2px solid #e3c77b;
+  background-color: var(--accent-hover);
+  color: #fff;
 }
 
-.main-container {
+/* Main layout */
+.app-main {
   flex: 1;
   display: flex;
-  overflow: hidden;
   justify-content: center;
-  align-items: center;
-  padding: 1rem;
+  padding: 1.5rem 1rem;
 }
 
-/* Responsive */
-@media (max-width: 600px) {
-  .app-header h1 {
-    font-size: 1.4rem;
+.main-content {
+  width: 100%;
+  max-width: var(--max-width);
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .header-inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .logo {
+    font-size: 1.25rem;
   }
 
   .navbar {
     flex-direction: column;
-    gap: 0.5rem;
+    width: 100%;
   }
 
   .nav-link {
-    font-size: 0.95rem;
+    width: 100%;
+    text-align: center;
   }
 
-  .main-container {
+  .app-main {
     padding: 1rem;
   }
 }

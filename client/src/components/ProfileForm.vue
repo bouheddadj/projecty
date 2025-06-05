@@ -1,34 +1,40 @@
 <template>
-  <div class="profile-page">
+  <section class="profile-page">
     <div class="profile-card">
       <h2>Modifier mon profil</h2>
 
-      <div class="form-group">
-        <label for="newPassword">Nouveau mot de passe</label>
-        <input
-          id="newPassword"
-          type="password"
-          v-model="newPassword"
-          placeholder="Nouveau mot de passe"
-        />
-      </div>
+      <form @submit.prevent="updateProfile" class="profile-form">
+        <div class="form-group">
+          <label for="newPassword">Nouveau mot de passe</label>
+          <input
+            id="newPassword"
+            type="password"
+            v-model="newPassword"
+            placeholder="Nouveau mot de passe"
+          />
+        </div>
 
-      <div class="form-group">
-        <label for="avatarUrl">URL de l'avatar</label>
-        <input
-          id="avatarUrl"
-          type="text"
-          v-model="avatarUrl"
-          placeholder="https://mon-site.com/image.jpg"
-        />
-      </div>
+        <div class="form-group">
+          <label for="avatarUrl">URL de l'avatar</label>
+          <input
+            id="avatarUrl"
+            type="text"
+            v-model="avatarUrl"
+            placeholder="https://mon-site.com/image.jpg"
+          />
+        </div>
 
-      <button @click="updateProfile">Mettre à jour</button>
-      <button class="back-button" @click="goBack">← Retour à la carte</button>
+        <div class="action-buttons">
+          <button type="submit">Mettre à jour</button>
+          <button type="button" class="back-button" @click="goBack">
+            ← Retour à la carte
+          </button>
+        </div>
 
-      <p v-if="message" class="message">{{ message }}</p>
+        <p v-if="message" class="feedback-message">{{ message }}</p>
+      </form>
     </div>
-  </div>
+  </section>
 </template>
 
 <script lang="ts">
@@ -103,38 +109,32 @@ export default defineComponent({
 </script>
 
 <style scoped>
-@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&display=swap");
-
 .profile-page {
+  flex: 1;
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
-  background: #0b0b0b;
-  padding: 2rem;
-  font-family: "Playfair Display", serif;
-  color: #f0f0f0;
+  padding: 2rem 1rem;
+  background: var(--main-bg);
+  min-height: calc(100vh - 80px);
   box-sizing: border-box;
 }
 
 .profile-card {
-  background: #161616;
-  padding: 2rem 2.5rem;
+  background: var(--card-bg);
+  padding: 2rem;
   border-radius: 12px;
-  box-shadow: 0 0 20px rgba(227, 199, 123, 0.12);
+  box-shadow: 0 4px 12px var(--shadow-color);
   width: 100%;
-  max-width: 420px;
-  text-align: center;
+  max-width: 500px;
   box-sizing: border-box;
-  border: 1px solid #333;
 }
 
 h2 {
   margin-bottom: 1rem;
-  color: #e3c77b;
-  font-size: 2rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  color: var(--accent);
+  font-size: 1.6rem;
+  text-align: center;
 }
 
 .form-group {
@@ -144,79 +144,83 @@ h2 {
 
 label {
   display: block;
-  margin-bottom: 6px;
+  margin-bottom: 0.5rem;
   font-weight: 600;
-  color: #e3c77b;
+  color: var(--accent);
 }
 
 input {
   width: 100%;
   padding: 0.65rem;
-  border: 1px solid #555;
+  border: 1px solid var(--border-color);
   border-radius: 6px;
   font-size: 1rem;
-  background: #1f1f1f;
-  color: #fff;
+  background: var(--input-bg);
+  color: var(--text-color);
   box-sizing: border-box;
-  transition: border-color 0.2s;
 }
 
 input:focus {
-  border-color: #e3c77b;
+  border-color: var(--accent);
   outline: none;
 }
 
+.action-buttons {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
 button {
-  width: 100%;
+  flex: 1 1 48%;
   padding: 0.75rem;
-  background-color: #e3c77b;
-  color: #0b0b0b;
   font-size: 1rem;
-  font-weight: bold;
-  border: none;
+  font-weight: 600;
   border-radius: 6px;
   cursor: pointer;
+  border: none;
   transition:
-    background-color 0.2s,
-    transform 0.1s;
-  margin-top: 0.5rem;
+    background-color 0.2s ease,
+    transform 0.1s ease;
 }
 
 button:hover {
-  background-color: #cfb45e;
   transform: translateY(-1px);
 }
 
+button[type="submit"] {
+  background: var(--accent);
+  color: white;
+}
+
 .back-button {
-  background-color: transparent;
-  color: #e3c77b;
-  border: 1px solid #e3c77b;
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent);
 }
 
 .back-button:hover {
-  background-color: #e3c77b;
-  color: #0b0b0b;
+  background: var(--accent);
+  color: white;
 }
 
-.message {
+.feedback-message {
   margin-top: 1rem;
-  color: #e3c77b;
+  color: var(--accent);
   font-weight: 500;
   font-size: 0.95rem;
+  text-align: center;
 }
 
-/* Responsive design */
-@media (max-width: 600px) {
-  .profile-page {
-    padding: 1rem;
-  }
-
+@media (max-width: 640px) {
   .profile-card {
     padding: 1.5rem 1rem;
   }
 
   h2 {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
   }
 
   input,
