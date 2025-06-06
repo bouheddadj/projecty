@@ -221,6 +221,8 @@ gameRouter.put("/resources/:id", async (req, res) => {
   const { id } = req.params;
   const { TTL } = req.body;
   const data = await readData();
+  data.vitrines = Array.isArray(data.vitrines) ? data.vitrines : [];
+
   if (TTL !== undefined) {
     // Met à jour le TTL
     const vitrine = (data.vitrines || []).find((v) => v.id === id);
@@ -243,7 +245,7 @@ gameRouter.delete("/resources/:id", async (req, res) => {
     }
 
     const data = await readData();
-    const vitrines = data.vitrines || [];
+    data.vitrines = Array.isArray(data.vitrines) ? data.vitrines : [];
 
     const index = vitrines.findIndex((v) => v.id === id);
     if (index === -1) {
