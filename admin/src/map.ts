@@ -14,6 +14,20 @@ let mymap: L.Map;
 
 const resourceMarkers: L.Marker[] = [];
 
+document.addEventListener("DOMContentLoaded", () => {
+  const logoutButton = document.getElementById("logoutButton");
+  logoutButton?.addEventListener("click", () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("Vous n'êtes pas connecté !");
+      return;
+    } else {
+      localStorage.removeItem("token");
+    }
+    window.location.href = "index.html";
+  });
+});
+
 function initMap(): L.Map {
   mymap = L.map("map", {
     center: [DEFAULT_LAT, DEFAULT_LNG],

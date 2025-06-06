@@ -107,6 +107,7 @@ export default defineComponent({
               body: `Bienvenue ${username.value} !`,
               icon: "/pwa-192x192.png",
             });
+            console.log("Notifications envoyées");
           } else if (Notification.permission !== "denied") {
             Notification.requestPermission().then((permission) => {
               if (permission === "granted") {

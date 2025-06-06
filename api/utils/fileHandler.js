@@ -5,31 +5,45 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Construction sûre du chemin, basé sur __dirname
 const dataPath = path.join(__dirname, "..", "data", "gameData.json");
 
-// Fonction pour lire le JSON en toute sécurité
+let writeQueue = Promise.resolve();
+
 export async function readData() {
   try {
+    await writeQueue;
+
     const raw = await fs.readFile(dataPath, "utf-8");
-    return raw.trim()
-      ? JSON.parse(raw)
-      : { players: [], vitrines: [], zrr: null, ttl: 60 };
+
+    if (!raw.trim()) {
+      return defaultGameData();
+    }
+
+    return JSON.parse(raw);
   } catch (e) {
     console.error("Erreur lecture JSON :", e);
-    return { players: [], vitrines: [], zrr: null, ttl: 60 };
+    return defaultGameData();
   }
 }
-
-let writeQueue = Promise.resolve();
 
 export async function writeData(data) {
   writeQueue = writeQueue.then(async () => {
     try {
-      await fs.writeFile(dataPath, JSON.stringify(data, null, 2), "utf-8");
+      const json = JSON.stringify(data, null, 2);
+      await fs.writeFile(dataPath, json, "utf-8");
     } catch (e) {
       console.error("Erreur écriture JSON :", e);
     }
   });
+
   return writeQueue;
+}
+
+function defaultGameData() {
+  return {
+    players: [],
+    vitrines: [],
+    zrr: null,
+    ttl: 60,
+  };
 }
