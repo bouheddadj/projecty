@@ -60,7 +60,7 @@ export default defineConfig({
           /^\/login/,
           /^\/register/,
           /^\/map/,
-          /^\/admin/,
+          /^\/secret/,
           /^\/profile/,
           /^\/assets/,
         ],
