@@ -18,7 +18,7 @@ public class AdminUserConfig {
 
     @Bean
     public User adminUser(UserDao userDao) throws NameAlreadyBoundException {
-        User adminUser = new User("admin", "adminpassword", Species.ADMIN, "admin.png");
+        User adminUser = new User("admin", "admin", Species.ADMIN, "admin.png");
         try {
             userDao.findOne(adminUser.getLogin());
         } catch (NameNotFoundException e) {
