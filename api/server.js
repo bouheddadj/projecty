@@ -1,3 +1,13 @@
+// server.js
+//
+// Serveur principal de l'API du jeu MIF13
+// - Authentification JWT via API externe (BASE_URL_USERS)
+// - Sécurisation des routes (isAuthenticated, isAdmin)
+// - Routing : /api/game (joueurs, vitrines, ZRR), /api/admin (admin)
+// - Gestion CORS, parsing JSON, gestion des erreurs HTTP explicites
+//
+// Auteur : THIEBAUD Enzo
+
 import express from "express";
 import dotenv from "dotenv";
 import process from "process";
@@ -8,6 +18,7 @@ import fetch from "node-fetch";
 import https from "https";
 import gameRouter from "./routes/gameRouter.js";
 import adminRouter from "./routes/adminRouter.js";
+import { startTTLLoop } from "./utils/ttlManager.js";
 
 const envFile =
   process.env.NODE_ENV === "production"
@@ -33,7 +44,10 @@ const isAuthenticated = async (req, res, next) => {
   const origin = req.headers["origin"] || "https://192.168.75.33";
 
   if (!authHeader || !authHeader.toLowerCase().startsWith("bearer ")) {
-    return res.status(401).json({ error: "Unauthorized: Token manquant" });
+    return res.status(401).json({
+      error:
+        "Authentification requise : token manquant dans l'en-tête Authorization.",
+    });
   }
 
   const token = authHeader.split(" ")[1];
@@ -42,11 +56,10 @@ const isAuthenticated = async (req, res, next) => {
   )}`;
 
   try {
-    console.log(`🔐 Authentification via : ${url}`);
-
+    console.log(`Authentification via : ${url}`);
     const response = await fetch(url, {
       method: "GET",
-      agent: httpsAgent,
+      agent: httpsAgent, // décommenter si besoin de valider le certificat
       headers: {
         Authorization: `Bearer ${token}`,
         Origin: origin,
@@ -63,19 +76,26 @@ const isAuthenticated = async (req, res, next) => {
       return next();
     }
 
-    return res.status(401).json({ error: "Unauthorized: Token rejeté" });
+    return res.status(401).json({
+      error:
+        "Authentification échouée : token invalide ou refusé par le serveur d'identité.",
+    });
   } catch (err) {
-    console.error("❌ Erreur dans isAuthenticated :", err.message);
-    return res
-      .status(500)
-      .json({ error: "Erreur serveur", details: err.message });
+    console.error("Erreur dans isAuthenticated :", err.message);
+    return res.status(500).json({
+      error: "Erreur serveur lors de l'authentification.",
+      details: err.message,
+    });
   }
 };
 
 const isAdmin = async (req, res, next) => {
   await isAuthenticated(req, res, () => {
     if (req.user?.species !== "ADMIN") {
-      return res.status(403).json({ error: "Accès refusé : Admin uniquement" });
+      return res.status(403).json({
+        error:
+          "Accès refusé : cette opération est réservée à l'administrateur.",
+      });
     }
     next();
   });
@@ -90,18 +110,36 @@ export function createServer() {
   app.use(express.json());
 
   app.get("/", (req, res) => {
-    res.sendFile("public/index.html", { root: __dirname });
+    try {
+      res.sendFile("public/index.html", { root: __dirname });
+    } catch (err) {
+      console.error("Erreur lors de l'accès à la racine :", err);
+      res
+        .status(500)
+        .send("Erreur serveur lors de l'accès à la page d'accueil.");
+    }
   });
 
   app.get("/static", (req, res) => {
-    res.sendFile("public/index.html", { root: __dirname });
+    try {
+      res.sendFile("public/index.html", { root: __dirname });
+    } catch (err) {
+      console.error("Erreur lors de l'accès à /static :", err);
+      res
+        .status(500)
+        .send("Erreur serveur lors de l'accès à la page statique.");
+    }
   });
 
   app.use("/api/game", isAuthenticated, gameRouter);
   app.use("/api/admin", isAdmin, adminRouter);
 
+  // Gestion 404 explicite
   app.use((req, res) => {
-    res.status(404).send("Sorry, can't find that!");
+    res.status(404).json({
+      error:
+        "Ressource non trouvée : l'URL demandée n'existe pas sur ce serveur.",
+    });
   });
 
   return app;
@@ -114,4 +152,5 @@ app.listen(PORT, () => {
   console.log(`✅ Serveur démarré sur http://localhost:${PORT}`);
   console.log(`🌍 Environnement : ${process.env.NODE_ENV}`);
   console.log(`🔗 BASE_URL_USERS = ${BASE_URL_USERS}`);
+  startTTLLoop(1000);
 });

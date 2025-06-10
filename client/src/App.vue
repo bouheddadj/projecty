@@ -22,7 +22,7 @@
 
 <script lang="ts">
 import { RouterLink, RouterView, useRoute } from "vue-router";
-import { computed } from "vue";
+import { computed, onMounted } from "vue";
 
 export default {
   name: "AppLayout",
@@ -35,6 +35,36 @@ export default {
     const showMenu = computed(() =>
       ["/login", "/register"].includes(route.path),
     );
+
+    let wakeLock: WakeLockSentinel | null = null;
+
+    async function requestWakeLock() {
+      try {
+        if ("wakeLock" in navigator) {
+          wakeLock = await (navigator as any).wakeLock.request("screen");
+          console.log("Wake Lock activé");
+
+          wakeLock.addEventListener("release", () => {
+            console.log("Wake Lock libéré");
+          });
+
+          document.addEventListener("visibilitychange", async () => {
+            if (wakeLock !== null && document.visibilityState === "visible") {
+              wakeLock = await (navigator as any).wakeLock.request("screen");
+              console.log("Wake Lock réactivé");
+            }
+          });
+        } else {
+          console.warn("Wake Lock API non supportée sur ce navigateur.");
+        }
+      } catch (err: any) {
+        console.error(`${err.name}: ${err.message}`);
+      }
+    }
+
+    onMounted(() => {
+      requestWakeLock();
+    });
 
     return { showMenu };
   },

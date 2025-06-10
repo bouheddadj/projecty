@@ -128,9 +128,17 @@ export const useGameStore = defineStore("game", {
         );
 
         if (res.status === 204) {
-          this.currentUser.score += 1;
           this.showcases = this.showcases.filter((v) => v.id !== id);
-          await this.deleteShowcase(id);
+          if ("vibrate" in navigator) {
+            if (this.currentUser.species === "VOLEUR") {
+              navigator.vibrate(100);
+            } else if (this.currentUser.species === "POLICIER") {
+              navigator.vibrate([100, 50, 100]);
+            }
+          }
+          await this.deleteShowcase(id).then(() => {
+            this.currentUser.score += 1;
+          });
           return;
         }
 

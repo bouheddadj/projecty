@@ -186,7 +186,6 @@ export default {
         markers.forEach((m) => map.removeLayer(m));
         markers.length = 0;
 
-        // Correction : n'afficher que les vitrines avec TTL > 0 et tous les joueurs
         resources.forEach((r: any) => {
           if (!r.position) return;
           if (r.TTL !== undefined && r.TTL <= 0) return; // Ne pas afficher les vitrines TTL=0
@@ -307,12 +306,6 @@ export default {
       // Ajout du rechargement automatique des ressources et de la ZRR
       setInterval(() => loadResources(map), 3000); // ressources toutes les 3 secondes
       setInterval(() => drawZRR(map), 5000); // ZRR toutes les 5s
-
-      // Décrémentation locale du TTL des vitrines toutes les 2 secondes
-      setInterval(() => {
-        const token = sessionStorage.getItem("token");
-        if (token) store.decrementShowcasesTTL(token);
-      }, 2000);
     });
 
     return {
